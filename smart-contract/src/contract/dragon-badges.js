@@ -6,7 +6,6 @@ module.exports = {
     client: null,
 
     config: {
-        apiEndpointURL: null,
         publicKey: null,
         privateKey: null
     },
@@ -19,16 +18,42 @@ module.exports = {
         if (typeof inIssuer.name === "undefined" || inIssuer.name.trim() == "")
             throw "Issuer name must be specified.";
 
-        let entity = {
-            "id": requestTxnId,
-            "type": "issuer",
-            "profile": {
-                "type": "Issuer"                
+        /*
+            Example (from spec):
+            {
+                "@context": "https://w3id.org/openbadges/v2",
+                "type": "Issuer",
+                "id": "https://example.org/organization.json",
+                "name": "An Example Badge Issuer",
+                "image": "https://example.org/logo.png",
+                "url": "https://example.org",
+                "email": "contact@example.org",
+                "publicKey": "https://example.org/publicKey.json",
+                "revocationList": "https://example.org/revocationList.json"
             }
-            
+
+        */
+
+
+        let entity = {
+            "entityId": requestTxnId,
+            "type": "Issuer"
         };
 
-        entity.profile = {...entity.profile, ...inIssuer};
+        entity = {...entity, ...inIssuer};
+
+        let imageKey = null;
+        let imageObj = null;
+        
+        // If image data is passed, create separate heap object and delete from main object //
+        if (typeof entity.imageObject !== "undefined")
+        {
+            imageObj = entity.imageObject; // Expected: {contentType: "[image/png|image/jpg|image/svg|...]", data: "asdf1234..."}
+
+            imageKey = `image-${requestTxnId}`;
+
+            delete entity.image;
+        }
 
         const entityKey = `entity-${requestTxnId}`;
 
@@ -39,6 +64,9 @@ module.exports = {
             },
             [entityKey]: entity
         }
+
+        if (imageKey !== null)
+            output[imageKey] = imageObj;
 
         return output;
     },
@@ -175,7 +203,5 @@ module.exports = {
         {            
             throw exception
         }
-    },
-
-    
+    }
 }
