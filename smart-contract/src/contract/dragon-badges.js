@@ -1,6 +1,74 @@
 'use strict'
 const uuid = require("uuid/v4");
 
+/*
+    Target Object: Signed Assertion (Base, no extensions)
+    {
+        "@context": "https://w3id.org/openbadges/v2",
+        "type": "Assertion",
+        "id": "urn:uuid:3bfcac4b-e3f9-456c-b194-997f4e3c2e63.json",
+        "recipient": {
+            "type": "email",
+            "hashed": true,
+            "salt": "deadsea",
+            "identity": "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
+        },
+        "image": "https://api.dragondevices.com/image/3bfcac4b-e3f9-456c-b194-997f4e3c2e63.png",
+        "issuedOn": "2016-12-31T23:59:59Z",
+        "badge": {
+            "id": "https://api.dragondevices.com/badgeClass/a66da451-20a2-43bb-bcea-bab2790027e4.json",
+            "type": "BadgeClass",
+            "name": "Member - Fellowship of the Order of Dragons",
+            "description": "This badge is awarded to all members accepted to the Fellowship of the Order of Dragons.",
+            "image": "https://api.dragondevices.com/image/a66da451-20a2-43bb-bcea-bab2790027e4.png",
+            "criteria": {                
+                "narrative": "To earn the **Fellowship Member Badge**, one must: \n\n 1. Be invited to the Fellowship of the Order of Dragons by a current member \n\n 2. Be accepted by the membership majority, and \n\n 3. Complete the requirements to become a member."
+            }
+            "issuer": {
+                "type": "Issuer",
+                "id": "https://api.dragondevices.com/issuer/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.json",
+                "name": "Dragonchain",
+                "image": "https://api.dragondevices.com/image/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.png",
+                "url": "https://www.dragonchain.com",
+                "publicKey": "https://api.dragondevices.com/publicKey/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.json",
+                "revocationList": "https://api.dragondevices.com/revocationList/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.json"
+            }
+        },
+        "verification": {
+            "type": "SignedBadge",
+            "creator": "https://api.dragondevices.com/publicKey/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.json"
+        }
+    }
+
+    Target Object: PublicKey
+    {
+        "@context": "https://w3id.org/openbadges/v2",
+        "type": "CryptographicKey",
+        "id": "https://api.dragondevices.com/publicKey/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.json",
+        "owner": "https://api.dragondevices.com/issuer/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.json",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIIBG0BA...OClDQAB\n-----END PUBLIC KEY-----\n"
+    }
+
+    TargetObject: RevocationList
+    {
+        "@context": "https://w3id.org/openbadges/v2",
+        "id": "https://api.dragondevices.com/revocationList/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.json",
+        "type": "RevocationList",
+        "issuer": "https://api.dragondevices.com/issuer/ebee93cc-9a01-4bc4-b6ce-ffd88e23e1f5.json",
+        "revokedAssertions": [
+            "urn:uuid:3c574c87-b96f-4f06-8eb5-68a29335b60e",
+            {
+                "id": "urn:uuid:e79a6c18-787e-4868-8e65-e6a4530fb418",
+                "revocationReason": "Honor code violation"
+            },
+            {
+                "uid": "abc123",
+                "revocationReason": "Issued in error."
+            }
+        ]
+    }
+*/
+
 module.exports = {
     // Dragonchain SDK client instance //
     client: null,
@@ -18,23 +86,6 @@ module.exports = {
         if (typeof inIssuer.name === "undefined" || inIssuer.name.trim() == "")
             throw "Issuer name must be specified.";
 
-        /*
-            Example (from spec):
-            {
-                "@context": "https://w3id.org/openbadges/v2",
-                "type": "Issuer",
-                "id": "https://example.org/organization.json",
-                "name": "An Example Badge Issuer",
-                "image": "https://example.org/logo.png",
-                "url": "https://example.org",
-                "email": "contact@example.org",
-                "publicKey": "https://example.org/publicKey.json",
-                "revocationList": "https://example.org/revocationList.json"
-            }
-
-        */
-
-
         let entity = {
             "entityId": requestTxnId,
             "type": "Issuer"
@@ -48,22 +99,42 @@ module.exports = {
         // If image data is passed, create separate heap object and delete from main object //
         if (typeof entity.imageObject !== "undefined")
         {
-            imageObj = entity.imageObject; // Expected: {contentType: "[image/png|image/jpg|image/svg|...]", data: "asdf1234..."}
+            imageObj = entity.imageObject; // Expected: {extension: "[png|jpg|svg]", contentType: "[image/png|image/jpg|image/svg|...]", data: "asdf1234..."}
 
             imageKey = `image-${requestTxnId}`;
 
-            delete entity.image;
+            delete entity.imageObject;
         }
 
-        const entityKey = `entity-${requestTxnId}`;
+        // Create a publicKey record and link to entity //
+        const publicKeyKey = `publicKey-${requestTxnId}`;
+
+        const publicKey = {
+            "type": "CryptographicKey",
+            "issuerEntityId": requestTxnId,
+            "publicKeyPem": this.config.publicKey
+        };
+
+        // Create a revocationList record and link to entity //
+        const revocationListKey = `revocationList-${requestTxnId}`;
+
+        const revocationList = {
+            "issuerEntityId": requestTxnId,
+            "type": "RevocationList",            
+            "revokedAssertions": []
+        };
+
+        const entityKey = `issuer-${requestTxnId}`;
 
         let output = {
             "response": {
                 "type": "createIssuer",
                 "entity": entity
             },
-            [entityKey]: entity
-        }
+            [entityKey]: entity,
+            [publicKeyKey]: publicKey,
+            [revocationListKey]: revocationList
+        };
 
         if (imageKey !== null)
             output[imageKey] = imageObj;
@@ -189,14 +260,14 @@ module.exports = {
         }
     },
 
-    getEntityObject: async function (options) {
+    getHeapObject: async function (options) {
         try {
-            const objResponse = await this.client.getSmartContractObject({key:`entity-${options.entityId}`})
+            const objResponse = await this.client.getSmartContractObject({key: options.key})
 
             const obj = JSON.parse(objResponse.response);
             
             if (obj.error)
-                throw "Entity Not Found: " + obj.error.details;
+                throw "Object Not Found: " + obj.error.details;
 
             return obj;
         } catch (exception)
