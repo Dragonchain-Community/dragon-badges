@@ -81,7 +81,7 @@ module.exports = {
     // +++ Main contract methods +++ //
     createIssuer: async function (requestTxnId, parameters)
     {
-        const inIssuer = parameters.issuer;
+        const inIssuer = parameters.issuer;        
 
         if (typeof inIssuer.name === "undefined" || inIssuer.name.trim() == "")
             throw "Issuer name must be specified.";
@@ -146,22 +146,58 @@ module.exports = {
     {
         const inBadgeClass = parameters.badgeClass;
 
+
+        /*
+            "type": "BadgeClass",
+            "name": "Member - Fellowship of the Order of Dragons",
+            "description": "This badge is awarded to all members accepted to the Fellowship of the Order of Dragons.",
+            "image": "https://api.dragondevices.com/image/a66da451-20a2-43bb-bcea-bab2790027e4.png",
+            "criteria": {                
+                "narrative": "To earn the **Fellowship Member Badge**, one must: \n\n 1. Be invited to the Fellowship of the Order of Dragons by a current member \n\n 2. Be accepted by the membership majority, and \n\n 3. Complete the requirements to become a member."
+            }
+        */
+
+        if (typeof inBadgeClass.issuerEntityId === "undefined" || inBadgeClass.issuerEntityId.trim() == "")
+            throw "Badge class issuer must be specified.";
+
+        if (typeof inBadgeClass.name === "undefined" || inBadgeClass.name.trim() == "")
+            throw "Badge class name must be specified.";
         
+        if (typeof inBadgeClass.description === "undefined" || inBadgeClass.description.trim() == "")
+            throw "Badge class description must be specified.";
+
+        if (typeof inBadgeClass.imageObject === "undefined")
+            throw "Badge class image must be specified.";
+
+        if (typeof inBadgeClass.imageObject.extension != "png" && typeof inBadgeClass.imageObject.extension != "svg")
+            throw "Only PNG and SVG are supported for badge class images.";
+
+        if (typeof inBadgeClass.criteria === "undefined" || typeof inBadgeClass.criteria.narrative === "undefined")
+            throw "Badge class criteria must be specified.";
+            
+
         let entity = {
-            "id": requestTxnId,
-            "type": "badgeClass"
+            "entityId": requestTxnId,
+            "type": "BadgeClass"
         };
 
         entity = {...entity, ...inBadgeClass};
 
-        const entityKey = `entity-${requestTxnId}`;
+        const imageObj = entity.imageObject; // Expected: {extension: "[png|svg]", contentType: "[image/png|image/svg|...]", data: "asdf1234..."}
+
+        const imageKey = `image-${requestTxnId}`;
+
+        delete entity.imageObject;
+
+        const entityKey = `badgeClass-${requestTxnId}`;
 
         let output = {
             "response": {
                 "type": "createBadgeClass",
                 "entity": entity
             },
-            [entityKey]: entity
+            [entityKey]: entity,
+            [imageKey]: imageObj
         }
 
         return output;
@@ -170,6 +206,8 @@ module.exports = {
     createHostedAssertion: async function (requestTxnId, parameters)
     {
         const inAssertion = parameters.assertion;
+
+        // For assertions, capture EVERYTHING and store in final form including URIs
 
         
         let entity = {
@@ -235,13 +273,28 @@ module.exports = {
 
         let output = {
             "apiKeyMap": {
-                "master": parameters.key
+                "master": parameters.keyHash
             }
         }
 
         return output;
     },
     
+
+    createAPIKey: async function (requestTxnId, parameters) 
+    {
+        const inApiKey = parameters.apiKey;
+
+        let apiKeyMap = await this.getAPIKeyMapObject();
+
+        apiKeyMap[inApiKey.entityId] = inApiKey.keyHash;
+
+        let output = {
+            "apiKeyMap": apiKeyMap
+        }
+
+        return output;
+    },
 
     // +++ Helper Methods +++ //
     getAPIKeyMapObject: async function () {
