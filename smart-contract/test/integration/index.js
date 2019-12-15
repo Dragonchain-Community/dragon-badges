@@ -4,11 +4,15 @@ const badger = require("../../src/contract/dragon-badges");
 
 const test = {
     apiKeyMap: {
-        create_master_key: require("./apiKeyMap/create_master_key")
+        create_master_key: require("./apiKeyMap/create_master_key"),
+        create_regular_key: require("./apiKeyMap/create_regular_key")
     },    
     issuer: {
         create_issuer_missing_data: require("./issuer/create_issuer_missing_data"),
         create_issuer: require("./issuer/create_issuer")
+    },
+    badgeClass: {
+        create_badge_class: require("./badgeClass/create_badgeClass")
     }
 };
 
@@ -55,6 +59,10 @@ badger.client = {
 
     assert.deepStrictEqual(result.actual, result.expected, "Create Master API Key");
 
+    result = await test.apiKeyMap.create_regular_key(badger);
+
+    assert.deepStrictEqual(result.actual, result.expected, "Create Regular API Key");
+
     
     // +++ ISSUER TESTS +++ //
 
@@ -67,6 +75,13 @@ badger.client = {
     assert.deepStrictEqual(result.actual, result.expected, "Create Issuer");
 
     let issuer = await badger.getHeapObject({"key": `issuer-${result.requestTxnId}`});
+
+    // Assert badge class created //
+    result = await test.badgeClass.create_badge_class(badger, {issuerEntityId: issuer.entityId});
+
+    assert.deepStrictEqual(result.actual, result.expected, "Create Badge Class");
+
+    let badgeClass = await badger.getHeapObject({"key": `badgeClass-${result.requestTxnId}`});
 
 
     console.log("Tests passed!");

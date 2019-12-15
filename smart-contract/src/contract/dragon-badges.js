@@ -1,5 +1,6 @@
 'use strict'
 const uuid = require("uuid/v4");
+const oven = require("openbadges-bakery");
 
 /*
     Target Object: Signed Assertion (Base, no extensions)
@@ -146,17 +147,6 @@ module.exports = {
     {
         const inBadgeClass = parameters.badgeClass;
 
-
-        /*
-            "type": "BadgeClass",
-            "name": "Member - Fellowship of the Order of Dragons",
-            "description": "This badge is awarded to all members accepted to the Fellowship of the Order of Dragons.",
-            "image": "https://api.dragondevices.com/image/a66da451-20a2-43bb-bcea-bab2790027e4.png",
-            "criteria": {                
-                "narrative": "To earn the **Fellowship Member Badge**, one must: \n\n 1. Be invited to the Fellowship of the Order of Dragons by a current member \n\n 2. Be accepted by the membership majority, and \n\n 3. Complete the requirements to become a member."
-            }
-        */
-
         if (typeof inBadgeClass.issuerEntityId === "undefined" || inBadgeClass.issuerEntityId.trim() == "")
             throw "Badge class issuer must be specified.";
 
@@ -169,7 +159,7 @@ module.exports = {
         if (typeof inBadgeClass.imageObject === "undefined")
             throw "Badge class image must be specified.";
 
-        if (typeof inBadgeClass.imageObject.extension != "png" && typeof inBadgeClass.imageObject.extension != "svg")
+        if (inBadgeClass.imageObject.extension != "png" && inBadgeClass.imageObject.extension != "svg")
             throw "Only PNG and SVG are supported for badge class images.";
 
         if (typeof inBadgeClass.criteria === "undefined" || typeof inBadgeClass.criteria.narrative === "undefined")
@@ -203,46 +193,64 @@ module.exports = {
         return output;
     },
 
-    createHostedAssertion: async function (requestTxnId, parameters)
-    {
-        const inAssertion = parameters.assertion;
-
-        // For assertions, capture EVERYTHING and store in final form including URIs
-
-        
-        let entity = {
-            "id": requestTxnId,
-            "type": "assertion"
-        };
-
-        entity = {...entity, ...inAssertion};
-
-        const entityKey = `entity-${requestTxnId}`;
-
-        let output = {
-            "response": {
-                "type": "createAssertion",
-                "entity": entity
-            },
-            [entityKey]: entity
-        }
-
-        return output;
-    },
-
     createSignedAssertion: async function (requestTxnId, parameters)
     {
         const inAssertion = parameters.assertion;
+        const urlPrefix = parameters.urlPrefix;
 
-        
+        // Create the Assertion object and a separate JWS string on the heap //
+
+        const issuer = await this.getHeapObject({key: `issuer-${inAssertion.issuerEntityId}`});
+
+        const issuerImageObject = await this.getHeapObject({key: `image-${inAssertion.issuerEntityId}`});
+
+        const badgeClass = await this.getHeapObject({key: `badgeClass-${inAssertion.badgeClassEntityId}`});
+
+        const badgeClassImageObject = await this.getHeapObject({key: `image-${inAssertion.badgeClassEntityId}`});
+
         let entity = {
-            "id": requestTxnId,
-            "type": "assertion"
+            "entityId": requestTxnId,
+            "type": "Assertion"
         };
 
         entity = {...entity, ...inAssertion};
 
-        const entityKey = `entity-${requestTxnId}`;
+        entity.issuedOn = new Date().toISOString();
+
+
+        // Bake the image //
+
+
+        const entityKey = `assertion-${requestTxnId}`;
+
+        let assertionObject = {
+            "@context": "https://w3id.org/openbadges/v2",
+            "type": "Assertion",
+            "id": `urn:uuid:${requestTxnId}.json`,
+            "issuedOn": entity.issuedOn,
+            "badge": {
+                "id": `${urlPrefix}/badgeClass/${badgeClass.entityId}.json`,
+                "type": "BadgeClass",
+                "name": badgeClass.name,
+                "description": badgeClass.description,
+                "criteria": badgeClass.criteria,
+                "image": badgeClassImageObject.data,
+                "issuer": {
+                    "id": `${urlPrefix}/issuer/${issuer.entityId}.json`,
+                    "type": "Issuer",
+                    "name": issuer.name,
+                    "description": issuer.description,
+                    "url": issuer.url,
+                    "image": issuerImageObject.data,
+                    "publicKey": `${urlPrefix}/publicKey/${issuer.entityId}.json`,
+                    "revocationList": `${urlPrefix}/revocationList/${issuer.entityId}.json`
+                }
+            },
+            "verification": {
+                "type": "SignedBadge",
+                "creator": `${urlPrefix}/publicKey/${issuer.entityId}.json`
+            }
+        }
 
         let output = {
             "response": {

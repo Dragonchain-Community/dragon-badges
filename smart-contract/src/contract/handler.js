@@ -10,6 +10,9 @@ module.exports = async input => {
   try {
     badger.client = await dcsdk.createClient();
 
+    //badger.config.publicKey
+    //badger.config.privateKey
+
     let output = await Reflect.apply(
       badger[inputObj.payload.method],
       badger,
