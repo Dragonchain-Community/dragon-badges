@@ -83,6 +83,19 @@ badger.client = {
 
     let badgeClass = await badger.getHeapObject({"key": `badgeClass-${result.requestTxnId}`});
 
+    await badger.createSignedAssertion("1234", {
+        assertion: {
+            "recipient": {
+                "type": "email",
+                "hashed": true,
+                "salt": "deadsea",
+                "identity": "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
+            },
+            badgeClassEntityId: badgeClass.entityId
+        }, 
+        urlPrefix: "http://127.0.0.1"
+
+    });
 
     console.log("Tests passed!");
 

@@ -12,7 +12,7 @@
   "dependencies": {
     "dragonchain-sdk": "^4.0.0",
     "get-stdin": "^7.0.0",
-    "openbadges-bakery": "^1.0.5",
+    "openbadges-bakery-v2": "^2.1.0",
     "uuid": "^3.3.3"
   }
 }

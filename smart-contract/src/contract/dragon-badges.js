@@ -1,6 +1,6 @@
 'use strict'
 const uuid = require("uuid/v4");
-const oven = require("openbadges-bakery");
+const oven = require("./bakery-mod");
 
 /*
     Target Object: Signed Assertion (Base, no extensions)
@@ -200,13 +200,13 @@ module.exports = {
 
         // Create the Assertion object and a separate JWS string on the heap //
 
-        const issuer = await this.getHeapObject({key: `issuer-${inAssertion.issuerEntityId}`});
-
-        const issuerImageObject = await this.getHeapObject({key: `image-${inAssertion.issuerEntityId}`});
-
         const badgeClass = await this.getHeapObject({key: `badgeClass-${inAssertion.badgeClassEntityId}`});
 
         const badgeClassImageObject = await this.getHeapObject({key: `image-${inAssertion.badgeClassEntityId}`});
+
+        const issuer = await this.getHeapObject({key: `issuer-${badgeClass.issuerEntityId}`});
+
+        const issuerImageObject = await this.getHeapObject({key: `image-${badgeClass.issuerEntityId}`});
 
         let entity = {
             "entityId": requestTxnId,
@@ -217,39 +217,54 @@ module.exports = {
 
         entity.issuedOn = new Date().toISOString();
 
-
-        // Bake the image //
-
-
         const entityKey = `assertion-${requestTxnId}`;
 
         let assertionObject = {
             "@context": "https://w3id.org/openbadges/v2",
             "type": "Assertion",
             "id": `urn:uuid:${requestTxnId}.json`,
-            "issuedOn": entity.issuedOn,
+            "recipient": entity.recipient,            
+            "issuedOn": entity.issuedOn,            
             "badge": {
                 "id": `${urlPrefix}/badgeClass/${badgeClass.entityId}.json`,
                 "type": "BadgeClass",
                 "name": badgeClass.name,
                 "description": badgeClass.description,
                 "criteria": badgeClass.criteria,
-                "image": badgeClassImageObject.data,
+                "image": `${urlPrefix}/image/${badgeClass.entityId}.${badgeClassImageObject.extension}`,
                 "issuer": {
                     "id": `${urlPrefix}/issuer/${issuer.entityId}.json`,
                     "type": "Issuer",
                     "name": issuer.name,
                     "description": issuer.description,
                     "url": issuer.url,
-                    "image": issuerImageObject.data,
+                    "image": `${urlPrefix}/image/${issuer.entityId}.${issuerImageObject.extension}`,
                     "publicKey": `${urlPrefix}/publicKey/${issuer.entityId}.json`,
                     "revocationList": `${urlPrefix}/revocationList/${issuer.entityId}.json`
                 }
             },
+            "image": `${urlPrefix}/image/${requestTxnId}.${badgeClassImageObject.extension}`,
             "verification": {
                 "type": "SignedBadge",
                 "creator": `${urlPrefix}/publicKey/${issuer.entityId}.json`
             }
+        }
+
+        // Create the JWS //
+        
+
+
+        // Bake the image //
+        let imageBuffer = Buffer.from(badgeClassImageObject.data, "base64");
+        
+        const bakedImageBuffer = await oven.bakeSync({image: imageBuffer, assertion: assertionObject});
+
+        const bakedImageKey = `image-${requestTxnId}`;
+
+        const bakedImageObject = {
+            "extension": badgeClassImageObject.extension,
+            "contentType": badgeClassImageObject.contentType,
+            "data": bakedImageBuffer.toString("base64")
         }
 
         let output = {
@@ -257,7 +272,9 @@ module.exports = {
                 "type": "createAssertion",
                 "entity": entity
             },
-            [entityKey]: entity
+            [entityKey]: assertionObject,
+            // <====== Signature
+            [bakedImageKey]: bakedImageObject
         }
 
         return output;
