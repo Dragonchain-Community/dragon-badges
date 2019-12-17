@@ -220,11 +220,12 @@ module.exports = {
 
         let assertionObject = {
             "@context": "https://w3id.org/openbadges/v2",
-            "type": "Assertion",
             "id": `urn:uuid:${requestTxnId}`,
+            "type": "Assertion",            
             "recipient": entity.recipient,            
             "issuedOn": entity.issuedOn,            
-            "badge": {
+            "badge": `${urlPrefix}/badgeClass/${badgeClass.entityId}.json`,
+            /*"badge": {
                 "id": `${urlPrefix}/badgeClass/${badgeClass.entityId}.json`,
                 "type": "BadgeClass",
                 "name": badgeClass.name,
@@ -241,7 +242,7 @@ module.exports = {
                     "publicKey": `${urlPrefix}/publicKey/${issuer.entityId}.json`,
                     "revocationList": `${urlPrefix}/revocationList/${issuer.entityId}.json`
                 }
-            },
+            },*/
             "image": `${urlPrefix}/image/${requestTxnId}.${badgeClassImageObject.extension}`,
             "verification": {
                 "type": "SignedBadge",
