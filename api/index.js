@@ -221,7 +221,7 @@ const main = async() => {
 	}));
 
 	// RevocationList //
-	app.get('/issuer/:issuerId.json', awaitHandlerFactory(async (req, res) => {
+	app.get('/revocationList/:issuerId.json', awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		const issuerObject = await helper.getHeapObject(client, {key: `issuer-${req.params.issuerId}`});
