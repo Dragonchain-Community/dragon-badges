@@ -242,7 +242,7 @@ module.exports = {
                     "revocationList": `${urlPrefix}/revocationList/${issuer.entityId}.json`
                 }
             },
-            //"image": `${urlPrefix}/image/${requestTxnId}.${badgeClassImageObject.extension}`,
+            "image": `${urlPrefix}/image/${requestTxnId}.${badgeClassImageObject.extension}`,
             "verification": {
                 "type": "SignedBadge",
                 "creator": `${urlPrefix}/publicKey/${issuer.entityId}.json`
@@ -261,7 +261,10 @@ module.exports = {
         // Bake the image //
         let imageBuffer = Buffer.from(badgeClassImageObject.data, "base64");
         
-        const bakedImageBuffer = await oven.bakeAsync({image: imageBuffer, signature: assertionSignature});
+        let bakedImageBuffer = await oven.bakeAsync({image: imageBuffer, signature: assertionSignature});
+
+        if (badgeClassImageObject.extension == "svg")
+            bakedImageBuffer = Buffer.from(bakedImageBuffer).toString("base64");
 
         //console.log(bakedImageBuffer.toString("base64"));
 
