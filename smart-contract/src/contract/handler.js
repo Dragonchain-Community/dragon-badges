@@ -8,8 +8,8 @@ module.exports = async inputObj => {
   try {
     badger.client = await dcsdk.createClient();
 
-    badger.config.publicKey = await badger.client.getSmartContractSecret({secretName: "publicSigningKey"});
-    badger.config.privateKey = await badger.client.getSmartContractSecret({secretName: "privateSigningKey"});
+    badger.config.publicKey = await badger.client.getSmartContractSecret({secretName: "publicsigningkey"});
+    badger.config.privateKey = await badger.client.getSmartContractSecret({secretName: "privatesigningkey"});
 
     let output = await Reflect.apply(
       badger[inputObj.payload.method],
