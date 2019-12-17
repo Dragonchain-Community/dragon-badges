@@ -3,15 +3,13 @@ const badger = require("./dragon-badges");
 
 const log = (string) => console.error(`STDERR: ${string}`);
 
-module.exports = async input => {
-  // Parse the request //
-  let inputObj = JSON.parse(input);
+module.exports = async inputObj => {
 
   try {
     badger.client = await dcsdk.createClient();
 
-    //badger.config.publicKey
-    //badger.config.privateKey
+    badger.config.publicKey = await badger.client.getSmartContractSecret({secretName: "publicSigningKey"});
+    badger.config.privateKey = await badger.client.getSmartContractSecret({secretName: "privateSigningKey"});
 
     let output = await Reflect.apply(
       badger[inputObj.payload.method],
