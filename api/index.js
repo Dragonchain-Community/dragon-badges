@@ -249,7 +249,7 @@ const main = async() => {
 
 		const badgeClassObject = await helper.getHeapObject(client, {key: `badgeClass-${req.params.badgeClassId}`});
 
-		const issuerObject = await helper.getHeapObject(client, {key: badgeClassObject.issuerEntityId});
+		const issuerObject = await helper.getHeapObject(client, {key: `issuer-${badgeClassObject.issuerEntityId}`});
 
 		/*
 			"type": "BadgeClass",
@@ -313,7 +313,7 @@ const main = async() => {
 	});
 
 	// In production (optionally) use port 80 or, if SSL available, use port 443 //
-	const server = app.listen(3050, () => {
+	const server = app.listen(helper.config.port, () => {
 		console.log(`Express running → PORT ${server.address().port}`);
 	});
 }

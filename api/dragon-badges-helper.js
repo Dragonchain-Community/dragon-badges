@@ -9,7 +9,7 @@ const redisearchEncode = (value) => {
 // General helper for interacting with our Dragonchain node using the SDK client //
 const helper = {              
 
-    config: require('./config'),
+    config: require('./config.json'),
     
     getIssuers: async function (client) {
         try {
