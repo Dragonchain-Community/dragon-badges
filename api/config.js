@@ -6,5 +6,5 @@ module.exports = {
     contractId: "bd9f1399-d9cf-4cb2-ab38-51723ad6342c",
 
     // This url prefix should be set to the publicly accessible URL prefix for all api routes if verification of badge data is required //
-    urlPrefix: "http://127.0.0.1"
+    urlPrefix: "http://127.0.0.1:3050"
 }

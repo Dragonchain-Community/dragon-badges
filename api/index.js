@@ -64,7 +64,7 @@ const main = async() => {
 		
 		const issuers = await helper.getissuers(client);
 
-		const issuerObjects = await Promise.all(issuers.map(async p => {return await helper.getEntityObject(client, {entityId: p.id})}));
+		const issuerObjects = await Promise.all(issuers.map(async p => {return await helper.getHeapObject(client, {key: `issuer-${p.id}`})}));
 
         res.json(issuerObjects);
 	}));	
@@ -73,24 +73,10 @@ const main = async() => {
 	app.get('/issuers/:issuerId', awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
-		const issuer = await helper.getHeapObject(client, {key: req.params.issuerId});
+		const issuer = await helper.getHeapObject(client, {key: `issuer-${req.params.badgeClassId}`});
 
 		res.json(issuer);
 	}));	
-
-	// Get a specific issuer profile in Open Badges format //
-	app.get('/issuer/:issuerId.json', awaitHandlerFactory(async (req, res) => {
-		const client = await dcsdk.createClient();
-
-		const issuer = await helper.getHeapObject(client, {key: req.params.issuerId});
-
-		res.writeHead(200, {
-			'Content-Type': 'application/ld+json'
-		});
-
-		res.json(issuer);
-	}));
-
 
 	// Create a new issuer //
 	app.post('/issuers', awaitHandlerFactory(async (req, res) => {
@@ -98,10 +84,216 @@ const main = async() => {
 
 		let issuer = req.body.issuer;
 
-		const requestTxn = await helper.createissuer(client, {issuer: issuer});
+		const requestTxn = await helper.createIssuer(client, {issuer: issuer});
 
 		res.json(requestTxn);
-    }));
+	}));
+	
+
+	// Get all badge classes //	
+	app.get('/badgeClasses', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+		
+		const badgeClasses = await helper.getBadgeClasses(client);
+
+		const badgeClassObjects = await Promise.all(badgeClasses.map(async p => {return await helper.getHeapObject(client, {key: `badgeClass-${p.id}`})}));
+
+        res.json(badgeClassObjects);
+	}));	
+
+	// Get a specific badgeclass //
+	app.get('/badgeClasses/:badgeClassId', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const badgeClass = await helper.getHeapObject(client, {key: `badgeClass-${req.params.badgeClassId}`});
+
+		res.json(badgeclass);
+	}));	
+
+	// Create a new badgeclass //
+	app.post('/badgeClasses', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		let badgeClass = req.body.badgeClass;
+
+		const requestTxn = await helper.createBadgeClass(client, {badgeClass: badgeClass});
+
+		res.json(requestTxn);
+	}));
+	
+
+
+	// Get all signed assertions //	
+	app.get('/signedAssertions', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+		
+		const assertions = await helper.getAssertions(client);
+
+		const assertionObjects = await Promise.all(assertions.map(async p => {return await helper.getHeapObject(client, {key: `assertion-${p.id}`})}));
+
+        res.json(assertionObjects);
+	}));	
+
+	// Get a specific signed assertion //
+	app.get('/signedAssertions/:assertionId', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const assertion = await helper.getHeapObject(client, {key: `assertion-${req.params.badgeClassId}`});
+
+		res.json(assertion);
+	}));	
+
+	// Create a new signed assertion //
+	app.post('/signedAssertions', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		let assertion = req.body.assertion;
+
+		const requestTxn = await helper.createSignedAssertion(client, {assertion: assertion, urlPrefix: helper.config.urlPrefix});
+
+		res.json(requestTxn);
+	}));
+
+
+	// +++++++++++ Open Badges-specific public endpoints +++++++++++++ //
+
+	// Issuer //
+	app.get('/issuer/:issuerId.json', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const issuerObject = await helper.getHeapObject(client, {key: `issuer-${req.params.issuerId}`});
+
+		const publicKeyObject = await helper.getHeapObject(client, {key: `publicKey-${issuerObject.entityId}`});
+
+		const revocationListObject = await helper.getHeapObject(client, {key: `revocationList-${issuerObject.entityId}`});
+
+		const issuer = {
+			"@context": "https://w3id.org/openbadges/v2",
+			"id": `${helper.config.urlPrefix}/issuer/${issuerObject.entityId}.json`,
+			"type": "Issuer",
+			"name": issuerObject.name,
+			"description": issuerObject.description,
+			"url": issuerObject.url,
+			"image": `${helper.config.urlPrefix}/image/${issuerObject.entityId}.json`,
+			"publicKey": {				
+				"id": `${helper.config.urlPrefix}/publicKey/${issuerObject.entityId}.json`,
+				"type": "CryptographicKey",
+				"owner": `${helper.config.urlPrefix}/issuer/${issuerObject.entityId}.json`,
+				"publicKeyPem": publicKeyObject.publicKeyPem
+			},
+			"revocationList": {				
+				"id": `${helper.config.urlPrefix}/revocationList/${issuerObject.entityId}.json`,
+				"type": "RevocationList",
+				"issuer": `${helper.config.urlPrefix}/issuer/${issuerObject.entityId}.json`,
+				"revokedAssertions": revocationListObject.revokedAssertions
+			}
+			
+		}
+
+		res.writeHead(200, {
+			'Content-Type': 'application/ld+json'
+		});
+
+		res.end(JSON.stringify(issuer));
+	}));
+
+	// Public Key //
+	app.get('/publicKey/:issuerId.json', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const issuerObject = await helper.getHeapObject(client, {key: `issuer-${req.params.issuerId}`});
+
+		const publicKeyObject = await helper.getHeapObject(client, {key: `publicKey-${issuerObject.entityId}`});
+
+		const publicKey = {
+			"@context": "https://w3id.org/openbadges/v2",							
+			"id": `${helper.config.urlPrefix}/publicKey/${issuerObject.entityId}.json`,
+			"type": "CryptographicKey",
+			"owner": `${helper.config.urlPrefix}/issuer/${issuerObject.entityId}.json`,
+			"publicKeyPem": publicKeyObject.publicKeyPem			
+		}
+
+		res.writeHead(200, {
+			'Content-Type': 'application/ld+json'
+		});
+
+		res.end(JSON.stringify(publicKey));
+	}));
+
+	// RevocationList //
+	app.get('/issuer/:issuerId.json', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const issuerObject = await helper.getHeapObject(client, {key: `issuer-${req.params.issuerId}`});
+
+		const revocationListObject = await helper.getHeapObject(client, {key: `revocationList-${issuerObject.entityId}`});
+
+		const revocationList = {
+			"@context": "https://w3id.org/openbadges/v2",					
+			"id": `${helper.config.urlPrefix}/revocationList/${issuerObject.entityId}.json`,
+			"type": "RevocationList",
+			"issuer": `${helper.config.urlPrefix}/issuer/${issuerObject.entityId}.json`,
+			"revokedAssertions": revocationListObject.revokedAssertions
+		}
+
+		res.writeHead(200, {
+			'Content-Type': 'application/ld+json'
+		});
+
+		res.end(JSON.stringify(revocationList));
+	}));
+
+	// Badge Class //
+	app.get('/badgeClass/:badgeClassId.json', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const badgeClassObject = await helper.getHeapObject(client, {key: `badgeClass-${req.params.badgeClassId}`});
+
+		const issuerObject = await helper.getHeapObject(client, {key: badgeClassObject.issuerEntityId});
+
+		/*
+			"type": "BadgeClass",
+            "name": "Member - Fellowship of the Order of Dragons",
+            "description": "This badge is awarded to all members accepted to the Fellowship of the Order of Dragons.",
+            "image": "https://api.dragondevices.com/image/a66da451-20a2-43bb-bcea-bab2790027e4.png",
+            "criteria": {                
+                "narrative": "To earn the **Fellowship Member Badge**, one must: \n\n 1. Be invited to the Fellowship of the Order of Dragons by a current member \n\n 2. Be accepted by the membership majority, and \n\n 3. Complete the requirements to become a member."
+            }
+		*/
+
+		const badgeClass = {
+			"@context": "https://w3id.org/openbadges/v2",			
+			"id": `${helper.config.urlPrefix}/badgeClass/${badgeClassObject.entityId}.json`,
+			"type": "BadgeClass",
+			"name": badgeClassObject.name,
+			"description": badgeClassObject.description,			
+			"image": `${helper.config.urlPrefix}/image/${badgeClassObject.entityId}.json`,
+			"criteria": badgeClassObject.criteria,
+			"issuer": `${helper.config.urlPrefix}/issuer/${badgeClassObject.issuerEntityId}.json`
+		}
+
+		res.writeHead(200, {
+			'Content-Type': 'application/ld+json'
+		});
+
+		res.end(JSON.stringify(badgeClass));
+	}));
+
+	// Image //
+	app.get('/image/:imageId.:extension', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const imageObject = await helper.getHeapObject(client, {key: `image-${req.params.imageId}`});
+
+		const imageBuffer = Buffer.from(imageObject.data, "base64");
+
+		res.writeHead(200, {
+			'Content-Type': imageObject.contentType,
+			'Content-Length': imageBuffer.length
+		});
+
+		res.end(imageBuffer);
+	}));
 
 
     // Get an object's Dragon Net verifications //

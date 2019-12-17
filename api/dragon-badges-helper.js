@@ -1,8 +1,6 @@
 const util = require('util');
 const crypto = require('crypto');
 
-const config = require('./config');
-
 // Escape a value for redisearch query purposes //
 const redisearchEncode = (value) => {
     return value.replace(/([^A-Za-z\d_|]+)/g, '\\$1');
@@ -10,11 +8,13 @@ const redisearchEncode = (value) => {
 
 // General helper for interacting with our Dragonchain node using the SDK client //
 const helper = {              
+
+    config: require('./config'),
     
-    getIssuers: async (client) => {
+    getIssuers: async function (client) {
         try {
             const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
+                transactionType: this.config.contractTxnType,
                 redisearchQuery: `@response_type:{createIssuer}`,
                 limit: 999999
             });
@@ -31,7 +31,7 @@ const helper = {
         }
     },
 
-    createIssuer: async (client, options) => {
+    createIssuer: async function (client, options) {
         try {
             let payload = {
                 "method":"createIssuer", 
@@ -41,7 +41,94 @@ const helper = {
             };
 
             const requestTxn = await client.createTransaction({
-                transactionType: config.contractTxnType,
+                transactionType: this.config.contractTxnType,
+                payload: payload
+            })
+
+            return requestTxn;
+
+        } catch (exception)
+        {
+            // Pass back to caller to handle gracefully //
+            throw exception;
+        }
+    },
+
+    getBadgeClasses: async function (client) {
+        try {
+            const transactions = await client.queryTransactions({
+                transactionType: this.config.contractTxnType,
+                redisearchQuery: `@response_type:{createBadgeClass}`,
+                limit: 999999
+            });
+
+            if (transactions.response.results)
+            {
+                return transactions.response.results.map(result => {return result.payload.response.entity});
+            } else 
+                return [];
+        } catch (exception)
+        {
+            // Pass back to caller to handle gracefully //
+            throw exception;
+        }
+    },
+
+    createBadgeClass: async function (client, options) {
+        try {
+            let payload = {
+                "method":"createBadgeClass", 
+                "parameters":{
+                    "badgeClass": options.badgeClass
+                }
+            };
+
+            const requestTxn = await client.createTransaction({
+                transactionType: this.config.contractTxnType,
+                payload: payload
+            })
+
+            return requestTxn;
+
+        } catch (exception)
+        {
+            // Pass back to caller to handle gracefully //
+            throw exception;
+        }
+    },
+
+    getAssertions: async function (client) {
+        try {
+            const transactions = await client.queryTransactions({
+                transactionType: this.config.contractTxnType,
+                redisearchQuery: `@response_type:{createAssertion}`,
+                limit: 999999
+            });
+
+            if (transactions.response.results)
+            {
+                return transactions.response.results.map(result => {return result.payload.response.entity});
+            } else 
+                return [];
+        } catch (exception)
+        {
+            // Pass back to caller to handle gracefully //
+            throw exception;
+        }
+    },
+
+    createSignedAssertion: async function (client, options) {
+        try {
+            let payload = {
+                "method":"createSignedAssertion", 
+                "parameters":{
+                    "assertion": options.assertion,
+                    "urlPrefix": options.urlPrefix
+                }
+            };
+
+            const requestTxn = await client.createTransaction({
+                transactionType: this.config.contractTxnType,
                 payload: payload
             })
 
@@ -58,7 +145,7 @@ const helper = {
     // +++ Heap Helpers +++ //
     getAPIKeyMapObject: async function (client) {
         try {
-            const objResponse = await client.getSmartContractObject({key:`apiKeyMap`, smartContractId: config.contractId})
+            const objResponse = await client.getSmartContractObject({key:`apiKeyMap`, smartContractId: this.config.contractId})
 
             const obj = JSON.parse(objResponse.response);
             
@@ -72,9 +159,9 @@ const helper = {
         }
     },
 
-    getEntityObject: async function (client, options) {
+    getHeapObject: async function (client, options) {
         try {
-            const objResponse = await client.getSmartContractObject({key:`entity-${options.entityId}`, smartContractId: config.contractId})
+            const objResponse = await client.getSmartContractObject({key: options.key, smartContractId: this.config.contractId})
 
             const obj = JSON.parse(objResponse.response);
             
@@ -92,7 +179,7 @@ const helper = {
         try {
 
             const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
+                transactionType: this.config.contractTxnType,
                 redisearchQuery: `@response_type:{createCustomer} @entity_email:{${redisearchEncode(options.email)}}`
             });
 
@@ -103,7 +190,7 @@ const helper = {
             } else 
                 throw `Invalid email or password.`;
 
-            const objResponse = await client.getSmartContractObject({key:`entity-${entity.id}`, smartContractId: config.contractId})
+            const objResponse = await client.getSmartContractObject({key:`entity-${entity.id}`, smartContractId: this.config.contractId})
 
             const obj = JSON.parse(objResponse.response);
             
@@ -112,38 +199,6 @@ const helper = {
 
             if (!this.validateHashedPassword(options.password, obj.hashedPassword))
                 throw "Invalid email or password.";
-
-            return obj;
-        } catch (exception)
-        {            
-            throw exception
-        }
-    },
-
-    getCreditRecordObject: async function (client, options) {
-        try {
-            const objResponse = await client.getSmartContractObject({key:`creditRecord-${options.creditRecordId}`, smartContractId: config.contractId})
-
-            const obj = JSON.parse(objResponse.response);
-            
-            if (obj.error)
-                throw "Credit Record Not Found: " + obj.error.details;
-
-            return obj;
-        } catch (exception)
-        {            
-            throw exception
-        }
-    },
-
-    getCreditRecordCertificateFileObject: async function (client, options) {
-        try {
-            const objResponse = await client.getSmartContractObject({key: options.creditRecordCertificateFileKey, smartContractId: config.contractId})
-
-            const obj = JSON.parse(objResponse.response);
-            
-            if (obj.error)
-                throw "Credit Record Certificate File Not Found: " + obj.error.details;
 
             return obj;
         } catch (exception)

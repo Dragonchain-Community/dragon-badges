@@ -17,7 +17,7 @@ module.exports = async function (badger, options) {
               "identity": "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
             },
             "issuedOn": issuedOn,
-            badgeClassEntityId: options.badgeClassEntityId
+            "badgeClassEntityId": options.badgeClassEntityId
           },
           "urlPrefix": "http://127.0.0.1"
         }
