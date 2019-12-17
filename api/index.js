@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 
-const helper = require('./ceblocks-helper');
+const helper = require('./dragon-badges-helper');
 
 const app = express();
 
@@ -30,6 +30,7 @@ const main = async() => {
 	// Basic authentication middleware //
 	app.use(async function (req, res, next) {
 
+		/*
         // check for basic auth header
 		if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
 			return res.status(401).json({ message: 'Missing Authorization Header' });
@@ -46,7 +47,9 @@ const main = async() => {
         
         if (typeof apiKeyMap[username] === "undefined" || !helper.validateHashedPassword(secret, apiKeyMap[username]))
             return res.status(401).json({ message: 'Invalid Authentication Credentials' });	
-            
+		  
+		*/
+
 		next();
 	})
 	
@@ -54,7 +57,52 @@ const main = async() => {
     /*
         ****NOTE: REMEMBER TO ADD ALL IDs AND REFERENCE IDs TO INDIVIDUAL OBJECT ENDPOINTS****
     */
-    
+	
+	// Get all issuers //	
+	app.get('/issuers', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+		
+		const issuers = await helper.getissuers(client);
+
+		const issuerObjects = await Promise.all(issuers.map(async p => {return await helper.getEntityObject(client, {entityId: p.id})}));
+
+        res.json(issuerObjects);
+	}));	
+
+	// Get a specific issuer //
+	app.get('/issuers/:issuerId', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const issuer = await helper.getHeapObject(client, {key: req.params.issuerId});
+
+		res.json(issuer);
+	}));	
+
+	// Get a specific issuer profile in Open Badges format //
+	app.get('/issuer/:issuerId.json', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const issuer = await helper.getHeapObject(client, {key: req.params.issuerId});
+
+		res.writeHead(200, {
+			'Content-Type': 'application/ld+json'
+		});
+
+		res.json(issuer);
+	}));
+
+
+	// Create a new issuer //
+	app.post('/issuers', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		let issuer = req.body.issuer;
+
+		const requestTxn = await helper.createissuer(client, {issuer: issuer});
+
+		res.json(requestTxn);
+    }));
+
 
     // Get an object's Dragon Net verifications //
 	app.get('/verifications/:objectId', awaitHandlerFactory(async (req, res) => {
@@ -73,7 +121,7 @@ const main = async() => {
 	});
 
 	// In production (optionally) use port 80 or, if SSL available, use port 443 //
-	const server = app.listen(3030, () => {
+	const server = app.listen(3050, () => {
 		console.log(`Express running → PORT ${server.address().port}`);
 	});
 }

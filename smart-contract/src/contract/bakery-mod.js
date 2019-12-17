@@ -3,7 +3,7 @@
 const oven = require("openbadges-bakery-v2");
 
 module.exports = {
-    bakeSync: function (options) {
+    bakeAsync: function (options) {
         return new Promise((resolve, reject) => {
             if (options.assertion)
             {

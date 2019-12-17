@@ -11,11 +11,11 @@ const redisearchEncode = (value) => {
 // General helper for interacting with our Dragonchain node using the SDK client //
 const helper = {              
     
-    getProviders: async (client) => {
+    getIssuers: async (client) => {
         try {
             const transactions = await client.queryTransactions({
                 transactionType: config.contractTxnType,
-                redisearchQuery: `@response_type:{createProvider}`,
+                redisearchQuery: `@response_type:{createIssuer}`,
                 limit: 999999
             });
 
@@ -31,12 +31,12 @@ const helper = {
         }
     },
 
-    createProvider: async (client, options) => {
+    createIssuer: async (client, options) => {
         try {
             let payload = {
-                "method":"createProvider", 
+                "method":"createIssuer", 
                 "parameters":{
-                    "provider": options.provider
+                    "issuer": options.issuer
                 }
             };
 
@@ -51,326 +51,6 @@ const helper = {
         {
             // Pass back to caller to handle gracefully //
             throw exception;
-        }
-    },
-
-    getPartners: async (client) => {
-        try {
-            const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
-                redisearchQuery: `@response_type:{createPartner}`,
-                limit: 999999
-            });
-
-            if (transactions.response.results)
-            {
-                return transactions.response.results.map(result => {return result.payload.response.entity});
-            } else 
-                return [];
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    findPartnersInIndustries: async (client, options) => {
-        try {
-
-            const industryList = options.industries.split(",").join("|");
-
-            const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
-                redisearchQuery: `@response_type:{createPartner} @entity_industries:{${redisearchEncode(industryList)}}`
-            });
-
-            if (transactions.response.total > 0)
-            {
-                return transactions.response.results.map((e) => e.payload.response.entity);
-            } else 
-                throw `Partners not found with specified industries.`;
-
-
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    createPartner: async (client, options) => {
-        try {
-            let payload = {
-                "method":"createPartner", 
-                "parameters":{
-                    "partner": options.partner
-                }
-            };
-
-            const requestTxn = await client.createTransaction({
-                transactionType: config.contractTxnType,
-                payload: payload
-            })
-
-            return requestTxn;
-
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    getParticipants: async (client) => {
-        try {
-            const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
-                redisearchQuery: `@response_type:{createParticipant}`,
-                limit: 999999
-            });
-
-            if (transactions.response.results)
-            {
-                return transactions.response.results.map(result => {return result.payload.response.entity});
-            } else 
-                return [];
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    findParticipantByIdentifier: async (client, options) => {
-        try {
-            const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
-                redisearchQuery: `@response_type:{createParticipant} @participant_provider_id:{${redisearchEncode(options.providerId)}} @participant_encrypted_customer_identifier:{${redisearchEncode(options.encryptedCustomerIdentifier)}}`
-            });
-
-            if (transactions.response.total > 0)
-            {
-                return transactions.response.results[0].payload.response.entity;
-            } else 
-                throw `Participant not found with specified provider Id and encrypted customer identifier.`;
-
-
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    createParticipant: async (client, options) => {
-        try {
-            let payload = {
-                "method":"createParticipant", 
-                "parameters":{
-                    "participant": options.participant
-                }
-            };
-
-            const requestTxn = await client.createTransaction({
-                transactionType: config.contractTxnType,
-                payload: payload
-            })
-
-            return requestTxn;
-
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    getCustomers: async (client) => {
-        try {
-            const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
-                redisearchQuery: `@response_type:{createCustomer}`,
-                limit: 999999
-            });
-
-            if (transactions.response.results)
-            {
-                return transactions.response.results.map(result => {return result.payload.response.entity});
-            } else 
-                return [];
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    createCustomer: async (client, options) => {
-        try {
-            let payload = {
-                "method":"createCustomer", 
-                "parameters":{
-                    "customer": options.customer
-                }
-            };
-
-            const requestTxn = await client.createTransaction({
-                transactionType: config.contractTxnType,
-                payload: payload
-            })
-
-            return requestTxn;
-
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    createCustomerParticipantRelationship: async (client, options) => {
-        try {
-            let payload = {
-                "method":"createCustomerParticipantRelationship", 
-                "parameters":{
-                    "customerParticipantRelationship": options.customerParticipantRelationship
-                }
-            };
-
-            const requestTxn = await client.createTransaction({
-                transactionType: config.contractTxnType,
-                payload: payload
-            })
-
-            return requestTxn;
-
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },    
-
-    getCreditRecords: async (client) => {
-        try {
-            const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
-                redisearchQuery: `@response_type:{createCreditRecord}`,
-                limit: 999999
-            });
-
-            if (transactions.response.results)
-            {
-                return transactions.response.results.map(result => {return result.payload.response.creditRecord});
-            } else 
-                return [];
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    createCreditRecord: async (client, options) => {
-        try {
-            let payload = {
-                "method":"createCreditRecord", 
-                "parameters":{
-                    "creditRecord": options.creditRecord
-                }
-            };
-
-            let request = {
-                transactionType: config.contractTxnType,
-                payload: payload
-            };
-
-            if (typeof options.callbackURL !== "undefine" && options.callbackURL != "")
-                request.callbackURL = options.callbackURL;
-
-            const requestTxn = await client.createTransaction(request);
-
-            return requestTxn;
-
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    transferPoints: async (client, options) => {
-        try {
-            let payload = {
-                "method":"transferPoints", 
-                "parameters":{
-                    "pointTransfer": options.pointTransfer
-                }
-            };
-
-            const requestTxn = await client.createTransaction({
-                transactionType: config.contractTxnType,
-                payload: payload
-            })
-
-            return requestTxn;
-
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    getPointTransferObjectsForEntities: async (client, options) => {
-        try {            
-            const transactions = await client.queryTransactions({
-                transactionType: config.contractTxnType,
-                redisearchQuery: `@response_type:{transferPoints} ((@transfer_points_from:{${redisearchEncode(options.entityList)}})|(@transfer_points_to:{${redisearchEncode(options.entityList)}}))`,
-                limit: 999999,
-                sortBy: 'timestamp',
-                sortAscending: true
-            });
-
-            if (transactions.response.results)
-            {
-                return transactions.response.results.map(result => {
-                    let transfer = result.payload.response.pointTransfer;
-
-                    transfer.timestamp = result.header.timestamp;
-
-                    return transfer;
-                });
-            } else 
-                return [];
-        } catch (exception)
-        {
-            // Pass back to caller to handle gracefully //
-            throw exception;
-        }
-    },
-
-    // +++ Dragon Net Verifications +++ //    
-    getBlockVerificationsForTxnId: async(client, options) => {
-        try {
-            // Get the RESPONSE transaction for the transaction ID/object ID //
-            const txnResponse = await client.queryTransactions({
-                transactionType: config.contractTxnType,
-                redisearchQuery: `@invoker:{${redisearchEncode(options.objectId)}}`,
-                limit: 999999
-            });
-
-            if (txnResponse.response.results && txnResponse.response.results.length > 0)
-            {                
-                const verificationsResponse = await client.getVerifications({blockId:txnResponse.response.results[0].header.block_id});
-            
-                return verificationsResponse.response;
-            } else {
-                throw "Object not found.";
-            }
-        } catch (exception)
-        {            
-            throw exception
         }
     },
 
@@ -475,6 +155,21 @@ const helper = {
     // +++ Utility +++ //
     sleep: (ms) => {
         return new Promise(resolve => setTimeout(resolve, ms));
+    },
+
+    getRecipientObjectFromEmail: function (email) {
+        let sum = crypto.createHash('sha256');
+        
+        const salt = crypto.randomBytes(16).toString('hex'); 
+        
+        sum.update(email + salt);
+
+        return {
+            "type": "email",
+            "hashed": true,
+            "salt": salt,
+            "identity": `sha256$${sum.digest('hex')}`
+        }
     },
 
     getHashedPassword: function (password) {

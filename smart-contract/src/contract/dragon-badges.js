@@ -216,14 +216,12 @@ module.exports = {
 
         entity = {...entity, ...inAssertion};
 
-        entity.issuedOn = new Date().toISOString();
-
         const assertionKey = `assertion-${requestTxnId}`;
 
         let assertionObject = {
             "@context": "https://w3id.org/openbadges/v2",
             "type": "Assertion",
-            "id": `urn:uuid:${requestTxnId}.json`,
+            "id": `urn:uuid:${requestTxnId}`,
             "recipient": entity.recipient,            
             "issuedOn": entity.issuedOn,            
             "badge": {
@@ -260,12 +258,12 @@ module.exports = {
             privateKey: this.config.privateKey
         });
 
-        console.log(assertionSignature)
-
         // Bake the image //
         let imageBuffer = Buffer.from(badgeClassImageObject.data, "base64");
         
-        const bakedImageBuffer = await oven.bakeSync({image: imageBuffer, assertion: assertionObject});
+        const bakedImageBuffer = await oven.bakeAsync({image: imageBuffer, signature: assertionSignature});
+
+        //console.log(bakedImageBuffer.toString("base64"));
 
         const bakedImageKey = `image-${requestTxnId}`;
 
