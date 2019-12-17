@@ -165,9 +165,9 @@ const main = async() => {
 
 		const issuerObject = await helper.getHeapObject(client, {key: `issuer-${req.params.issuerId}`});
 
-		const publicKeyObject = await helper.getHeapObject(client, {key: `publicKey-${issuerObject.entityId}`});
+		//const publicKeyObject = await helper.getHeapObject(client, {key: `publicKey-${issuerObject.entityId}`});
 
-		const revocationListObject = await helper.getHeapObject(client, {key: `revocationList-${issuerObject.entityId}`});
+		//const revocationListObject = await helper.getHeapObject(client, {key: `revocationList-${issuerObject.entityId}`});
 
 		const issuer = {
 			"@context": "https://w3id.org/openbadges/v2",
@@ -177,18 +177,8 @@ const main = async() => {
 			"description": issuerObject.description,
 			"url": issuerObject.url,
 			"image": `${helper.config.urlPrefix}/image/${issuerObject.entityId}.json`,
-			"publicKey": {				
-				"id": `${helper.config.urlPrefix}/publicKey/${issuerObject.entityId}.json`,
-				"type": "CryptographicKey",
-				"owner": `${helper.config.urlPrefix}/issuer/${issuerObject.entityId}.json`,
-				"publicKeyPem": publicKeyObject.publicKeyPem
-			},
-			"revocationList": {				
-				"id": `${helper.config.urlPrefix}/revocationList/${issuerObject.entityId}.json`,
-				"type": "RevocationList",
-				"issuer": `${helper.config.urlPrefix}/issuer/${issuerObject.entityId}.json`,
-				"revokedAssertions": revocationListObject.revokedAssertions
-			}
+			"publicKey": `${helper.config.urlPrefix}/publicKey/${issuerObject.entityId}.json`,
+			"revocationList": `${helper.config.urlPrefix}/publicKey/${issuerObject.entityId}.json`
 			
 		}
 
