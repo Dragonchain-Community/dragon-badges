@@ -242,7 +242,7 @@ module.exports = {
                     "revocationList": `${urlPrefix}/revocationList/${issuer.entityId}.json`
                 }
             },
-            "image": `${urlPrefix}/image/${requestTxnId}.${badgeClassImageObject.extension}`,
+            //"image": `${urlPrefix}/image/${requestTxnId}.${badgeClassImageObject.extension}`,
             "verification": {
                 "type": "SignedBadge",
                 "creator": `${urlPrefix}/publicKey/${issuer.entityId}.json`
