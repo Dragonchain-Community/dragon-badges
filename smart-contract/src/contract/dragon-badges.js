@@ -244,7 +244,8 @@ module.exports = {
             },
             "image": `${urlPrefix}/image/${requestTxnId}.${badgeClassImageObject.extension}`,
             "verification": {
-                "type": "SignedBadge"
+                "type": "SignedBadge",
+                "creator": `${urlPrefix}/publicKey/${issuer.entityId}.json`
             }
         }
 

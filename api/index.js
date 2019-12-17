@@ -192,11 +192,7 @@ const main = async() => {
 			
 		}
 
-		res.writeHead(200, {
-			'Content-Type': 'application/ld+json'
-		});
-
-		res.end(JSON.stringify(issuer));
+		res.set("Content-Type", "application/ld+json").json(issuer);
 	}));
 
 	// Public Key //
@@ -215,11 +211,7 @@ const main = async() => {
 			"publicKeyPem": publicKeyObject.publicKeyPem			
 		}
 
-		res.writeHead(200, {
-			'Content-Type': 'application/ld+json'
-		});
-
-		res.end(JSON.stringify(publicKey));
+		res.set("Content-Type", "application/ld+json").json(publicKey);
 	}));
 
 	// RevocationList //
@@ -238,11 +230,7 @@ const main = async() => {
 			"revokedAssertions": revocationListObject.revokedAssertions
 		}
 
-		res.writeHead(200, {
-			'Content-Type': 'application/ld+json'
-		});
-
-		res.end(JSON.stringify(revocationList));
+		res.set("Content-Type", "application/ld+json").json(revocationList);
 	}));
 
 	// Badge Class //
@@ -274,11 +262,7 @@ const main = async() => {
 			"issuer": `${helper.config.urlPrefix}/issuer/${badgeClassObject.issuerEntityId}.json`
 		}
 
-		res.writeHead(200, {
-			'Content-Type': 'application/ld+json'
-		});
-
-		res.end(JSON.stringify(badgeClass));
+		res.set("Content-Type", "application/ld+json").json(badgeClass);
 	}));
 
 	// Image //
