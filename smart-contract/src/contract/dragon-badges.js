@@ -1,5 +1,6 @@
 'use strict'
 const uuid = require("uuid/v4");
+const jws = require("jws");
 const oven = require("./bakery-mod");
 
 /*
@@ -217,7 +218,7 @@ module.exports = {
 
         entity.issuedOn = new Date().toISOString();
 
-        const entityKey = `assertion-${requestTxnId}`;
+        const assertionKey = `assertion-${requestTxnId}`;
 
         let assertionObject = {
             "@context": "https://w3id.org/openbadges/v2",
@@ -251,8 +252,15 @@ module.exports = {
         }
 
         // Create the JWS //
-        
+        const assertionSignatureKey = `assertionSignature-${requestTxnId}`;
 
+        const assertionSignature = jws.sign({
+            header: {alg: 'RS256'},
+            payload: assertionObject,
+            privateKey: this.config.privateKey
+        });
+
+        console.log(assertionSignature)
 
         // Bake the image //
         let imageBuffer = Buffer.from(badgeClassImageObject.data, "base64");
@@ -272,8 +280,8 @@ module.exports = {
                 "type": "createAssertion",
                 "entity": entity
             },
-            [entityKey]: assertionObject,
-            // <====== Signature
+            [assertionKey]: assertionObject,
+            [assertionSignatureKey]: assertionSignature,
             [bakedImageKey]: bakedImageObject
         }
 
