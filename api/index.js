@@ -149,6 +149,8 @@ const main = async() => {
 
 		let assertion = req.body.assertion;
 
+		assertion.recipient = helper.getRecipientObjectFromEmail(req.body.email);
+
 		const requestTxn = await helper.createSignedAssertion(client, {assertion: assertion, urlPrefix: helper.config.urlPrefix});
 
 		res.json(requestTxn);
