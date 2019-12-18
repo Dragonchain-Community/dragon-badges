@@ -15,7 +15,8 @@ const test = {
         create_badge_class: require("./badgeClass/create_badgeClass")
     },
     assertion: {
-        create_signed_assertion: require("./assertion/create_signed_assertion")
+        create_signed_assertion: require("./assertion/create_signed_assertion"),
+        create_hosted_assertion: require("./assertion/create_hosted_assertion")
     }
 };
 
@@ -97,7 +98,10 @@ badger.client = {
 
     assert.deepStrictEqual(result.actual, result.expected);
 
-    
+
+    result = await test.assertion.create_hosted_assertion(badger, {badgeClassEntityId: badgeClass.entityId, issuerEntityId: issuer.entityId});
+
+    assert.deepStrictEqual(result.actual, result.expected);
 
     
 

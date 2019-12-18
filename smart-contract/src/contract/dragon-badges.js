@@ -329,7 +329,7 @@ module.exports = {
         // Bake the image //
         let imageBuffer = Buffer.from(badgeClassImageObject.data, "base64");
         
-        let bakedImageBuffer = await oven.bakeAsync({image: imageBuffer, assertion: assertionObject});
+        let bakedImageBuffer = await oven.bakeAsync({image: imageBuffer, url: `${urlPrefix}/hostedAssertion/${requestTxnId}.json`});
 
         if (badgeClassImageObject.extension == "svg")
             bakedImageBuffer = Buffer.from(bakedImageBuffer).toString("base64");
