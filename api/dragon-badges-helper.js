@@ -141,6 +141,30 @@ const helper = {
         }
     },
 
+    createHostedAssertion: async function (client, options) {
+        try {
+            let payload = {
+                "method":"createHostedAssertion", 
+                "parameters":{
+                    "assertion": options.assertion,
+                    "urlPrefix": options.urlPrefix
+                }
+            };
+
+            const requestTxn = await client.createTransaction({
+                transactionType: this.config.contractTxnType,
+                payload: payload
+            })
+
+            return requestTxn;
+
+        } catch (exception)
+        {
+            // Pass back to caller to handle gracefully //
+            throw exception;
+        }
+    },
+
 
     // +++ Heap Helpers +++ //
     getAPIKeyMapObject: async function (client) {

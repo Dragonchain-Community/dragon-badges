@@ -157,6 +157,40 @@ const main = async() => {
 	}));
 
 
+	// Get all hosted assertions //	
+	app.get('/hostedAssertions', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+		
+		const assertions = await helper.getAssertions(client);
+
+		const assertionObjects = await Promise.all(assertions.map(async p => {return await helper.getHeapObject(client, {key: `assertion-${p.id}`})}));
+
+        res.json(assertionObjects);
+	}));	
+
+	// Get a specific hosted assertion //
+	app.get('/hostedAssertions/:assertionId', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const assertion = await helper.getHeapObject(client, {key: `assertion-${req.params.badgeClassId}`});
+
+		res.json(assertion);
+	}));	
+
+	// Create a new hosted assertion //
+	app.post('/hostedAssertions', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		let assertion = req.body.assertion;
+
+		assertion.recipient = helper.getRecipientObjectFromEmail(req.body.email);
+
+		const requestTxn = await helper.createHostedAssertion(client, {assertion: assertion, urlPrefix: helper.config.urlPrefix});
+
+		res.json(requestTxn);
+	}));
+
+
 	// +++++++++++ Open Badges-specific public endpoints +++++++++++++ //
 
 	// Issuer //
