@@ -289,6 +289,15 @@ const main = async() => {
 		res.set("Content-Type", "application/ld+json").json(badgeClass);
 	}));
 
+	// Hosted Assertion //
+	app.get('/hostedAssertion/:assertionId.json', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const assertionObject = await helper.getHeapObject(client, {key: `assertion-${req.params.assertionId}`});
+
+		res.set("Content-Type", "application/ld+json").json(assertionObject);
+	}));
+
 	// Image //
 	app.get('/image/:imageId.:extension', awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
