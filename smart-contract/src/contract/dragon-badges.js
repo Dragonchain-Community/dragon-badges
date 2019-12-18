@@ -289,7 +289,72 @@ module.exports = {
         return output;
     },
 
+    createHostedAssertion: async function (requestTxnId, parameters)
+    {
+        const inAssertion = parameters.assertion;
+        const urlPrefix = parameters.urlPrefix;
 
+        // Create the Assertion object and a separate JWS string on the heap //
+
+        const badgeClass = await this.getHeapObject({key: `badgeClass-${inAssertion.badgeClassEntityId}`});
+
+        const badgeClassImageObject = await this.getHeapObject({key: `image-${inAssertion.badgeClassEntityId}`});
+
+        /*const issuer = await this.getHeapObject({key: `issuer-${badgeClass.issuerEntityId}`});
+
+        const issuerImageObject = await this.getHeapObject({key: `image-${badgeClass.issuerEntityId}`});*/
+
+        let entity = {
+            "entityId": requestTxnId,
+            "type": "Assertion"
+        };
+
+        entity = {...entity, ...inAssertion};
+
+        const assertionKey = `assertion-${requestTxnId}`;
+
+        let assertionObject = {
+            "@context": "https://w3id.org/openbadges/v2",
+            "id": `${urlPrefix}/hostedAssertion/${requestTxnId}.json`,
+            "type": "Assertion",            
+            "recipient": entity.recipient,            
+            "issuedOn": entity.issuedOn,                        
+            "badge": `${urlPrefix}/badgeClass/${badgeClass.entityId}.json`,
+            "image": `${urlPrefix}/image/${requestTxnId}.${badgeClassImageObject.extension}`,
+            "verification": {
+                "type": "HostedBadge"
+            }
+        }
+
+        // Bake the image //
+        let imageBuffer = Buffer.from(badgeClassImageObject.data, "base64");
+        
+        let bakedImageBuffer = await oven.bakeAsync({image: imageBuffer, assertion: assertionObject});
+
+        if (badgeClassImageObject.extension == "svg")
+            bakedImageBuffer = Buffer.from(bakedImageBuffer).toString("base64");
+
+        //console.log(bakedImageBuffer.toString("base64"));
+
+        const bakedImageKey = `image-${requestTxnId}`;
+
+        const bakedImageObject = {
+            "extension": badgeClassImageObject.extension,
+            "contentType": badgeClassImageObject.contentType,
+            "data": bakedImageBuffer.toString("base64")
+        }
+
+        let output = {
+            "response": {
+                "type": "createAssertion",
+                "entity": entity
+            },
+            [assertionKey]: assertionObject,
+            [bakedImageKey]: bakedImageObject
+        }
+
+        return output;
+    },
     
     // +++ API Key Management Methods +++ //
     createMasterAPIKey: async function (requestTxnId, parameters) 
