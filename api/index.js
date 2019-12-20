@@ -124,7 +124,7 @@ const main = async() => {
 
 		const badgeClass = await helper.getHeapObject(client, {key: `badgeClass-${req.params.badgeClassId}`});
 
-		res.json(badgeclass);
+		res.json(badgeClass);
 	}));	
 
 	// Create a new badgeclass //
