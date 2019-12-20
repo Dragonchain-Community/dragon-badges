@@ -22,6 +22,8 @@ const main = async() => {
 
     app.use(helmet());
 
+	app.use(helmet.noCache());
+
 	app.use(cors());
 
     app.use(bodyParser.urlencoded({ extended: true, limit:'10mb' }))
