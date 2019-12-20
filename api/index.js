@@ -30,9 +30,8 @@ const main = async() => {
     app.use(bodyParser.json({limit: '10mb'}));
 
 	// Basic authentication middleware //
-	app.use(async function (req, res, next) {
-
-		/*
+	const authenticate = async function (req, res, next) {
+		
         // check for basic auth header
 		if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
 			return res.status(401).json({ message: 'Missing Authorization Header' });
@@ -50,10 +49,10 @@ const main = async() => {
         if (typeof apiKeyMap[username] === "undefined" || !helper.validateHashedPassword(secret, apiKeyMap[username]))
             return res.status(401).json({ message: 'Invalid Authentication Credentials' });	
 		  
-		*/
+		
 
 		next();
-	})
+	};
 	
     
     /*
@@ -61,7 +60,7 @@ const main = async() => {
     */
 	
 	// Get all issuers //	
-	app.get('/issuers', awaitHandlerFactory(async (req, res) => {
+	app.get('/issuers', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 		
 		const issuers = await helper.getIssuers(client);
@@ -72,7 +71,7 @@ const main = async() => {
 	}));	
 
 	// Get a specific issuer //
-	app.get('/issuers/:issuerId', awaitHandlerFactory(async (req, res) => {
+	app.get('/issuers/:issuerId', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		const issuer = await helper.getHeapObject(client, {key: `issuer-${req.params.issuerId}`});
@@ -85,7 +84,7 @@ const main = async() => {
 	}));	
 
 	// Get a specific issuer's badge classes //
-	app.get('/issuers/:issuerId/badgeClasses', awaitHandlerFactory(async (req, res) => {
+	app.get('/issuers/:issuerId/badgeClasses', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		const badgeClasses = await helper.getIssuerBadgeClasses(client, {issuerEntityId: req.params.issuerId});
@@ -96,7 +95,7 @@ const main = async() => {
 	}));	
 
 	// Create a new issuer //
-	app.post('/issuers', awaitHandlerFactory(async (req, res) => {
+	app.post('/issuers', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		let issuer = req.body.issuer;
@@ -108,7 +107,7 @@ const main = async() => {
 	
 
 	// Get all badge classes //	
-	app.get('/badgeClasses', awaitHandlerFactory(async (req, res) => {
+	app.get('/badgeClasses', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 		
 		const badgeClasses = await helper.getBadgeClasses(client);
@@ -128,7 +127,7 @@ const main = async() => {
 	}));	
 
 	// Create a new badgeclass //
-	app.post('/badgeClasses', awaitHandlerFactory(async (req, res) => {
+	app.post('/badgeClasses', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		let badgeClass = req.body.badgeClass;
@@ -141,7 +140,7 @@ const main = async() => {
 
 
 	// Get all signed assertions //	
-	app.get('/signedAssertions', awaitHandlerFactory(async (req, res) => {
+	app.get('/signedAssertions', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 		
 		const assertions = await helper.getAssertions(client);
@@ -152,7 +151,7 @@ const main = async() => {
 	}));	
 
 	// Get a specific signed assertion //
-	app.get('/signedAssertions/:assertionId', awaitHandlerFactory(async (req, res) => {
+	app.get('/signedAssertions/:assertionId', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		const assertion = await helper.getHeapObject(client, {key: `assertion-${req.params.assertionId}`});
@@ -161,7 +160,7 @@ const main = async() => {
 	}));	
 
 	// Create a new signed assertion //
-	app.post('/signedAssertions', awaitHandlerFactory(async (req, res) => {
+	app.post('/signedAssertions', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		let assertion = req.body.assertion;
@@ -175,7 +174,7 @@ const main = async() => {
 
 
 	// Get all hosted assertions //	
-	app.get('/hostedAssertions', awaitHandlerFactory(async (req, res) => {
+	app.get('/hostedAssertions', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 		
 		const assertions = await helper.getAssertions(client);
@@ -186,7 +185,7 @@ const main = async() => {
 	}));	
 
 	// Get a specific hosted assertion //
-	app.get('/hostedAssertions/:assertionId', awaitHandlerFactory(async (req, res) => {
+	app.get('/hostedAssertions/:assertionId', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		const assertion = await helper.getHeapObject(client, {key: `assertion-${req.params.badgeClassId}`});
@@ -195,7 +194,7 @@ const main = async() => {
 	}));	
 
 	// Create a new hosted assertion //
-	app.post('/hostedAssertions', awaitHandlerFactory(async (req, res) => {
+	app.post('/hostedAssertions', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
 		let assertion = req.body.assertion;
