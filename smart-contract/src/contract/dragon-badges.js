@@ -105,6 +105,8 @@ module.exports = {
 
             imageKey = `image-${requestTxnId}`;
 
+            entity.imageFileName = `${requestTxnId}.${entity.imageObject.extension}`;
+
             delete entity.imageObject;
         }
 
@@ -177,6 +179,8 @@ module.exports = {
         const imageObj = entity.imageObject; // Expected: {extension: "[png|svg]", contentType: "[image/png|image/svg|...]", data: "asdf1234..."}
 
         const imageKey = `image-${requestTxnId}`;
+
+        entity.imageFileName = `${requestTxnId}.${entity.imageObject.extension}`;
 
         delete entity.imageObject;
 

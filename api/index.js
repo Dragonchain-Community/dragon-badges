@@ -331,15 +331,6 @@ const main = async() => {
 		res.end(imageBuffer);
 	}));
 
-	// Image as data uri //
-	app.get('/image/:imageId', awaitHandlerFactory(async (req, res) => {
-		const client = await dcsdk.createClient();
-
-		const imageObject = await helper.getHeapObject(client, {key: `image-${req.params.imageId}`});
-
-		res.send(`data:${imageObject.contentType};base64,${imageObject.data}`);
-	}));
-
     // Get an object's Dragon Net verifications //
 	app.get('/verifications/:objectId', awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
