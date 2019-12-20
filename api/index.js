@@ -75,7 +75,7 @@ const main = async() => {
 	app.get('/issuers/:issuerId', awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
-		const issuer = await helper.getHeapObject(client, {key: `issuer-${req.params.badgeClassId}`});
+		const issuer = await helper.getHeapObject(client, {key: `issuer-${req.params.issuerId}`});
 
 		res.json(issuer);
 	}));	
