@@ -1,0 +1,33 @@
+<div class="mt-5 mx-auto">
+    <h1 class="mb-5 text-center">Badge Class</h1>
+
+    <div class="row">
+        <div class="col-9">
+            <table class="table mb-5">
+                <tr class="d-flex">
+                    <th class="col-3">Name</th>
+                    <td class="col-9">{{{badgeClass.name}}}</td>
+                </tr>
+                <tr class="d-flex">
+                    <th class="col-3">Description</th>
+                    <td class="col-9">{{{badgeClass.description}}}</td>
+                </tr>
+                <tr class="d-flex">
+                    <th class="col-3">Criteria</th>
+                    <td class="col-9">{{badgeClass.criteria.narrative}}</td>
+                </tr>
+                
+            </table>
+        </div>
+        <div class="col-3">
+            <img class="img-fluid" src="{{imageURLPrefix}}/image/{{badgeClass.imageFileName}}">
+        </div>
+    </div>
+    
+    <p class="text-center mb-5">
+        <a class="btn btn-success" href="/AwardBadge/{{badgeClass.entityId}}">Award Badge</a>
+    </p>
+    
+</div>
+
+        

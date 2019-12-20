@@ -1,0 +1,59 @@
+<div class="mt-5 mx-auto">
+    <h2 class="text-center">Badge Issuers</h2>
+
+    <table class="table table-bordered">
+
+        <thead class="thead-light">
+            <tr>
+                <th class="w-25">Issuer Name</th>
+                <th class="">Description</th>                
+                <th class=""></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each issuers}}
+                <tr>
+                    <td>{{{this.name}}}</td>
+                    <td>{{{this.description}}}</td>                    
+                    <td class="text-center">                            
+                        <a href="/Issuer/{{this.entityId}}">View Details</a>                            
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <p class="text-right">
+        <a class="btn btn-success" href="/AddIssuer/">Add an Issuer</a>
+    </p>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $(".timestamp").each(function (i, elem) {
+            var date = new Date(parseInt($(elem).text()) * 1000).toLocaleDateString();
+
+            $(elem).text(date);
+        });
+
+        var transfers = {{{json customer.pointTransfers}}};
+
+        var participants = {{{json customer.participants}}};
+
+        var entityIds = ["{{customer.id}}"];
+
+        for (var i = 0; i < participants.length; i++)
+            entityIds.push(participants[i].id);
+
+        $.each (transfers, function (i, transfer) {            
+            $("#transfers tbody").append(
+                $("<tr/>")
+                    .append($("<td/>").text(entityIds.includes(transfer.toEntityId) ? "Credit" : "Debit"))
+                    .append($("<td/>").addClass("text-center").text(transfer.points.toFixed(2)))
+                    .append($("<td/>").text(transfer.memo))
+                    .append($("<td/>").text(new Date(parseInt(transfer.timestamp) * 1000).toString()))
+            )
+        })
+    })
+</script>

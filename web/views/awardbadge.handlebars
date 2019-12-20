@@ -1,0 +1,29 @@
+<div class="mt-5 mx-auto">
+    <h1>Awarding a Badge</h1>
+
+    <div class="row">
+        <div class="col-8">
+            <form class="form" method="post">
+                <p>
+                    <label>Recipient Email Address</label>
+                    <input type="text" class="form-control" id="recipientEmail" name="recipientEmail"/>            
+                </p>
+
+                <p>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </p>
+            </form>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <img class="card-img-top" src="{{imageURLPrefix}}/image/{{badgeClass.imageFileName}}">
+                <div class="card-body">
+                    <h5 class="card-title">{{badgeClass.name}}</h5>
+                    <p class="card-text">{{badgeClass.description}}</p>                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</div>

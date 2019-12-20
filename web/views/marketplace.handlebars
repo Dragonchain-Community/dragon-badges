@@ -1,0 +1,66 @@
+<div class="mt-5 mx-auto">
+    <h1 class="text-center mb-5">Partner Marketplace</h1>
+    
+    <h3 class="text-center mb-5">CEB Token Balance: <b><span class="text-success">{{tokenBalance}}</span></b></h3>
+
+    <table class="table">
+        {{#each partners}}
+            <tr class="d-flex">
+                <th class="col-3"><img class="img-fluid" src="{{this.logoURL}}"></th>
+                <td class="col-9">
+                    <div class="row">
+                        {{#each this.offers}}
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <img src="{{this.imageURL}}" class="card-img-top" alt="">                                    
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{this.name}}</h5>
+                                        <p class="card-text"><b>Cost</b>: {{this.cost}} CEB Tokens</p>
+                                        <button class="btn btn-primary redeem" data-shop-link="{{this.shopURL}}" data-coupon="{{this.coupon}}" {{#if this.disabled}}disabled{{/if}}>Redeem</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {{/each}}
+                    </div>
+                </td>
+            </tr>
+        {{/each}}
+    </table>
+    
+</div>
+
+<div class="modal fade" id="redemptionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">CEBlocks Offer Redemption</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+            <h3 class="mb-5">Here's your coupon for <b>$10 Off Writing Implements</b> at marketplace partner <b>Levenger</b>!</h3>
+
+            <div class="p-3 bg-light border mb-5"><h4>Coupon Code: <b>LEVCEB001</b></h4></div>
+
+            <p>
+                <a class="btn btn-success btn-lg" href="https://www.levenger.com/writing-8.aspx" target="_blank">Shop at Levenger</a>
+            </p>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(".redeem").click(function () {
+            var coupon = $(this).attr("data-coupon");
+            var shopURL =  $(this).attr("data-shop-link");
+
+            $.get("/Marketplace/Redeem/")
+                .then(function (data) {
+                    $("#redemptionModal").modal();
+                })
+        })
+    })
+</script>
