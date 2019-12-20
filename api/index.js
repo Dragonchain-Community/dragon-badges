@@ -90,7 +90,7 @@ const main = async() => {
 
 		const badgeClasses = await helper.getIssuerBadgeClasses(client, {issuerEntityId: req.params.issuerId});
 
-		const badgeClassObjects = await Promise.all(badgeClasses.map(async p => {return await helper.getHeapObject(client, {key: `issuer-${p.entityId}`})}));
+		const badgeClassObjects = await Promise.all(badgeClasses.map(async p => {return await helper.getHeapObject(client, {key: `badgeClass-${p.entityId}`})}));
 
 		res.json(badgeClassObjects);
 	}));	
