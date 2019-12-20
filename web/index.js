@@ -234,14 +234,12 @@ const main = async() => {
 			headers: {
 				"Authorization": `Basic ${config.auth}`
 			},
-			body: {
-				assertion: {
-					"assertion": {			
-						"badgeClassEntityId": req.params.badgeClassId,
-						"issuedOn": new Date().toISOString()
-					},
-					"email": req.body.recipientEmail
-				}
+			body: {				
+				"assertion": {			
+					"badgeClassEntityId": req.params.badgeClassId,
+					"issuedOn": new Date().toISOString()
+				},
+				"email": req.body.recipientEmail				
 			},
 			json: true 
 		};

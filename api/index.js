@@ -155,7 +155,7 @@ const main = async() => {
 	app.get('/signedAssertions/:assertionId', awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
-		const assertion = await helper.getHeapObject(client, {key: `assertion-${req.params.badgeClassId}`});
+		const assertion = await helper.getHeapObject(client, {key: `assertion-${req.params.assertionId}`});
 
 		res.json(assertion);
 	}));	
