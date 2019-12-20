@@ -64,7 +64,7 @@ const main = async() => {
 	app.get('/issuers', awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 		
-		const issuers = await helper.getissuers(client);
+		const issuers = await helper.getIssuers(client);
 
 		const issuerObjects = await Promise.all(issuers.map(async p => {return await helper.getHeapObject(client, {key: `issuer-${p.id}`})}));
 
