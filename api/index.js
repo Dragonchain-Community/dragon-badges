@@ -77,6 +77,10 @@ const main = async() => {
 
 		const issuer = await helper.getHeapObject(client, {key: `issuer-${req.params.issuerId}`});
 
+		const issuerImageObject = await helper.getHeapObject(client, {key: `image-${req.params.issuerId}`});
+
+		issuer.imageURL = `/image/${req.params.issuerId}.${issuerImageObject.extension}`;
+
 		res.json(issuer);
 	}));	
 
