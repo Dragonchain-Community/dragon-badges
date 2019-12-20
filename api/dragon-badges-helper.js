@@ -31,6 +31,26 @@ const helper = {
         }
     },
 
+    getIssuerBadgeClasses: async function (client, options) {
+        try {
+            const transactions = await client.queryTransactions({
+                transactionType: this.config.contractTxnType,
+                redisearchQuery: `@badge_class_issuer_id:{${redisearchEncode(options.issuerEntityId)}}`,
+                limit: 999999
+            });
+
+            if (transactions.response.results)
+            {
+                return transactions.response.results.map(result => {return result.payload.response.entity});
+            } else 
+                return [];
+        } catch (exception)
+        {
+            // Pass back to caller to handle gracefully //
+            throw exception;
+        }
+    },
+
     createIssuer: async function (client, options) {
         try {
             let payload = {

@@ -84,6 +84,17 @@ const main = async() => {
 		res.json(issuer);
 	}));	
 
+	// Get a specific issuer's badge classes //
+	app.get('/issuers/:issuerId/badgeClasses', awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+
+		const badgeClasses = await helper.getIssuerBadgeClasses(client, {issuerEntityId: req.params.issuerId});
+
+		const badgeClassObjects = await Promise.all(issuers.map(async p => {return await helper.getHeapObject(client, {key: `issuer-${p.entityId}`})}));
+
+		res.json(badgeClassObjects);
+	}));	
+
 	// Create a new issuer //
 	app.post('/issuers', awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
