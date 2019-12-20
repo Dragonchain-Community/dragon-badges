@@ -66,7 +66,7 @@ const main = async() => {
 		
 		const issuers = await helper.getIssuers(client);
 
-		const issuerObjects = await Promise.all(issuers.map(async p => {return await helper.getHeapObject(client, {key: `issuer-${p.id}`})}));
+		const issuerObjects = await Promise.all(issuers.map(async p => {return await helper.getHeapObject(client, {key: `issuer-${p.entityId}`})}));
 
         res.json(issuerObjects);
 	}));	
