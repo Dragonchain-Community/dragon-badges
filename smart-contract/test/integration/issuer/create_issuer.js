@@ -59,7 +59,8 @@ module.exports = async function (badger) {
                 "type": "Issuer",
                 "name": "Test Issuer",
                 "description": "A badge issuer",
-                "url": "https://www.example.com",
+                "url": "https://www.example.com",                
+                "imageFileName": `${txnId}.${imageObject.extension}`
               }
             },
             [entityKey]: {
@@ -69,6 +70,7 @@ module.exports = async function (badger) {
                 "name": "Test Issuer",
                 "description": "A badge issuer",
                 "url": "https://www.example.com",
+                "imageFileName": `${txnId}.${imageObject.extension}`
             },
             [publicKeyKey]: publicKey,
             [revocationListKey]: revocationList,

@@ -161,6 +161,29 @@ const helper = {
         }
     },
 
+    revokeSignedAssertion: async function (client, options) {
+        try {
+            let payload = {
+                "method":"revokeSignedAssertion", 
+                "parameters":{
+                    "revocation": options.revocation
+                }
+            };
+
+            const requestTxn = await client.createTransaction({
+                transactionType: this.config.contractTxnType,
+                payload: payload
+            })
+
+            return requestTxn;
+
+        } catch (exception)
+        {
+            // Pass back to caller to handle gracefully //
+            throw exception;
+        }
+    },
+
     createHostedAssertion: async function (client, options) {
         try {
             let payload = {

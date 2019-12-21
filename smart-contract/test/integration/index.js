@@ -15,8 +15,9 @@ const test = {
         create_badge_class: require("./badgeClass/create_badgeClass")
     },
     assertion: {
-        create_signed_assertion: require("./assertion/create_signed_assertion"),
-        create_hosted_assertion: require("./assertion/create_hosted_assertion")
+        create_hosted_assertion: require("./assertion/create_hosted_assertion"),
+        create_signed_assertion: require("./assertion/create_signed_assertion"),        
+        revoke_signed_assertion: require("./assertion/revoke_signed_assertion")
     }
 };
 
@@ -93,16 +94,22 @@ badger.client = {
 
     // +++ ASSERTION TESTS +++ //
 
-    // Assert assertion created //
+    // Assert signed assertion created //
     result = await test.assertion.create_signed_assertion(badger, {badgeClassEntityId: badgeClass.entityId, issuerEntityId: issuer.entityId});
 
     assert.deepStrictEqual(result.actual, result.expected);
 
+    let signedAssertion = await badger.getHeapObject({"key": `assertion-${result.requestTxnId}`});
 
+    // Assert hosted assertion created //
     result = await test.assertion.create_hosted_assertion(badger, {badgeClassEntityId: badgeClass.entityId, issuerEntityId: issuer.entityId});
 
     assert.deepStrictEqual(result.actual, result.expected);
 
+    // Assert signed assertion revoked //
+    result = await test.assertion.revoke_signed_assertion(badger, {assertionEntityId: signedAssertion.id.replace("urn:uuid:", "")});
+
+    assert.deepStrictEqual(result.actual, result.expected);
     
 
     console.log("Tests passed!");

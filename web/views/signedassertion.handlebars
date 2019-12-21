@@ -1,0 +1,24 @@
+<div class="mt-5 mx-auto">
+    <h1 class="mb-5 text-center">Signed Assertion</h1>
+
+    <p class="text-center mb-4">
+        <b>Signed Badge Image URL:</b><br><a href="{{assertion.image}}" target="_blank">{{assertion.image}}</a>
+    </p>
+
+    <div class="row">
+        <div class="col-9">
+            <pre class="bg-light p-2"><code>{{jsonPretty assertion}}</code></pre>
+        </div>
+        <div class="col-3">
+            <p class="mb-3">
+                <img class="img-fluid" src="{{assertion.image}}">
+            </p>
+            <p class="text-center">
+                <a href="https://badgecheck.io/" class="btn btn-lg btn-info" target="_blank">Verify Badge</a>
+            </p>
+        </div>
+    </div>
+ 
+</div>
+
+        

@@ -206,6 +206,22 @@ const main = async() => {
 		res.json(requestTxn);
 	}));
 
+	// Revoke a signed assertion //
+	app.post('/revokeSignedAssertion/:assertionId', authenticate, awaitHandlerFactory(async (req, res) => {
+		const client = await dcsdk.createClient();
+		
+		let reason = req.body.reason;
+		
+		let	revocation = {
+			assertionEntityId: req.params.assertionId,
+			revocationReason: reason
+		};
+		
+		const requestTxn = await helper.revokeSignedAssertion(client, {revocation: revocation});
+
+		res.json(requestTxn);
+	}));
+
 
 	// +++++++++++ Open Badges-specific public endpoints +++++++++++++ //
 

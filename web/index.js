@@ -31,6 +31,7 @@ const main = async() => {
     var hbs = exphbs.create({
 		helpers: {
 			json: function (context) {return JSON.stringify(context);},
+			jsonPretty: function (context) {return JSON.stringify(context, null, 2);},
 			list: function(context, options) {
 				var ret = "";
 			  
@@ -248,15 +249,20 @@ const main = async() => {
 
 		await sleep(6000);
 
+		res.redirect(`/SignedAssertion/${result.response.transaction_id}`);
+	}));
+
+	app.get('/SignedAssertion/:assertionId', awaitHandlerFactory(async (req, res) => {
+
 		const signedAssertion = await rp({
-			uri: `${config.apiURL}/signedAssertions/${result.response.transaction_id}`,
+			uri: `${config.apiURL}/signedAssertions/${req.params.assertionId}`,
 			headers: {
 				"Authorization": `Basic ${config.auth}`
 			},
 			json: true
 		});		
 
-		res.redirect(signedAssertion.image);
+		res.render('signedassertion', {title: "Dragon Badges Signed Assertion", assertion: signedAssertion});
 	}));
 
     app.use(function (err, req, res, next) {

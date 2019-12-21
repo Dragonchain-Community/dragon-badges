@@ -293,6 +293,40 @@ module.exports = {
         return output;
     },
 
+    revokeSignedAssertion: async function (requestTxnId, parameters)
+    {
+        const inRevocation = parameters.revocation;
+
+        const assertion = await this.getHeapObject({key: `assertion-${inRevocation.assertionEntityId}`});
+
+        const issuerEntityId = assertion.badge.issuer.id.split("/").pop().replace(".json", "");
+
+        const revocationList = await this.getHeapObject({key: `revocationList-${issuerEntityId}`});
+
+        let revocation = null;
+        if (typeof inRevocation.reason !== "undefined" && inRevocation.reason != null && inRevocation.reason.trim() != "")
+            revocation = {
+                id: inRevocation.assertionEntityId,
+                revocationReason: inRevocation.reason
+            }
+        else
+            revocation = inRevocation.assertionEntityId
+
+        revocationList.revokedAssertions.push(revocation);
+
+        const revocationListKey = `revocationList-${issuerEntityId}`;
+
+        let output = {
+            "response": {
+                "type": "revokeSignedAssertion",
+                "revocation": revocation
+            },
+            [revocationListKey]: revocationList
+        }
+
+        return output;
+    },
+
     createHostedAssertion: async function (requestTxnId, parameters)
     {
         const inAssertion = parameters.assertion;

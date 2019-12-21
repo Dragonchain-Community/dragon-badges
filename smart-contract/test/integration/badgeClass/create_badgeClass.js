@@ -59,7 +59,8 @@ module.exports = async function (badger, options) {
                 "description": "A badge of badgery.",                       
                 "criteria": {
                   "narrative": "The means by which a badgery badge is obtained is as follows..."
-                }
+                },
+                "imageFileName": `${txnId}.${imageObject.extension}`
               }
             },
             [entityKey]: {
@@ -70,7 +71,8 @@ module.exports = async function (badger, options) {
               "description": "A badge of badgery.",                       
               "criteria": {
                 "narrative": "The means by which a badgery badge is obtained is as follows..."
-              }
+              },
+              "imageFileName": `${txnId}.${imageObject.extension}`
             },
             [imageKey]: imageObject
         }
