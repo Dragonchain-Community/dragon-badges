@@ -23,7 +23,7 @@ module.exports = async function (badger, options) {
     badger.client.updateSmartContractHeap(result);
 
     revocationList.revokedAssertions.push({
-        "id": options.assertionEntityId,
+        "id": `urn:uuid:${options.assertionEntityId}`,
         "revocationReason": "Bad stuff."   
       });
 
@@ -36,7 +36,7 @@ module.exports = async function (badger, options) {
             "response": {
               "type": "revokeSignedAssertion",
               "revocation": {                
-                "id": options.assertionEntityId,
+                "id": `urn:uuid:${options.assertionEntityId}`,
                 "revocationReason": "Bad stuff."
               }
             },

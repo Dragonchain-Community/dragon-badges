@@ -306,11 +306,11 @@ module.exports = {
         let revocation = null;
         if (typeof inRevocation.reason !== "undefined" && inRevocation.reason != null && inRevocation.reason.trim() != "")
             revocation = {
-                id: inRevocation.assertionEntityId,
+                id: `urn:uuid:${inRevocation.assertionEntityId}`,
                 revocationReason: inRevocation.reason
             }
         else
-            revocation = inRevocation.assertionEntityId
+            revocation = `urn:uuid:${inRevocation.assertionEntityId}`;
 
         revocationList.revokedAssertions.push(revocation);
 
