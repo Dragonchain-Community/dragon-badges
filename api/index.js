@@ -154,7 +154,7 @@ const main = async() => {
 	app.get('/signedAssertions/:assertionId', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
-		const assertion = await helper.getHeapObject(client, {key: `assertion-${req.params.assertionId}`});
+		const assertion = await helper.getHeapObject(client, {key: `signedAssertion-${req.params.assertionId}`});
 
 		res.json(assertion);
 	}));	
@@ -188,7 +188,7 @@ const main = async() => {
 	app.get('/hostedAssertions/:assertionId', authenticate, awaitHandlerFactory(async (req, res) => {
 		const client = await dcsdk.createClient();
 
-		const assertion = await helper.getHeapObject(client, {key: `assertion-${req.params.badgeClassId}`});
+		const assertion = await helper.getHeapObject(client, {key: `hostedAssertion-${req.params.badgeClassId}`});
 
 		res.json(assertion);
 	}));	
