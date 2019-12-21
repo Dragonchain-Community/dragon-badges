@@ -117,11 +117,31 @@ const helper = {
         }
     },
 
-    getAssertions: async function (client) {
+    getSignedAssertions: async function (client) {
         try {
             const transactions = await client.queryTransactions({
                 transactionType: this.config.contractTxnType,
-                redisearchQuery: `@response_type:{createAssertion}`,
+                redisearchQuery: `@response_type:{createSignedAssertion}`,
+                limit: 999999
+            });
+
+            if (transactions.response.results)
+            {
+                return transactions.response.results.map(result => {return result.payload.response.entity});
+            } else 
+                return [];
+        } catch (exception)
+        {
+            // Pass back to caller to handle gracefully //
+            throw exception;
+        }
+    },
+
+    getHostedAssertions: async function (client) {
+        try {
+            const transactions = await client.queryTransactions({
+                transactionType: this.config.contractTxnType,
+                redisearchQuery: `@response_type:{createHostedAssertion}`,
                 limit: 999999
             });
 

@@ -27,6 +27,8 @@ module.exports = async function (badger, options) {
 
     const assertionKey = `assertion-${txnId}`;
 
+    const signedAssertionKey = `signedAssertion-${txnId}`;
+
     const assertionSignatureKey = `assertionSignature-${txnId}`;
     
     const imageKey = `image-${txnId}`;
@@ -36,7 +38,7 @@ module.exports = async function (badger, options) {
         "actual": result,        
         "expected": {
             "response": {
-              "type": "createAssertion",
+              "type": "createSignedAssertion",
               "entity": {                
                 "entityId": txnId,
                 "type": "Assertion",                
@@ -50,7 +52,19 @@ module.exports = async function (badger, options) {
                 "badgeClassEntityId": options.badgeClassEntityId
               }
             },
-            [assertionKey]: {
+            [assertionKey]: {                
+              "entityId": txnId,
+              "type": "Assertion",                
+              "recipient": {
+                "type": "email",
+                "hashed": true,
+                "salt": "deadsea",
+                "identity": "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
+              },
+              "issuedOn": issuedOn,
+              "badgeClassEntityId": options.badgeClassEntityId
+            },
+            [signedAssertionKey]: {
               "@context": "https://w3id.org/openbadges/v2",
               "type": "Assertion",
               "id": `urn:uuid:${txnId}`,
@@ -87,7 +101,7 @@ module.exports = async function (badger, options) {
                 "creator": `http://127.0.0.1/publicKey/${options.issuerEntityId}.json`
               }
             },
-            [assertionKey]: result[assertionKey],
+            [signedAssertionKey]: result[signedAssertionKey],
             [assertionSignatureKey]: result[assertionSignatureKey],
             [imageKey]: result[imageKey]
         }

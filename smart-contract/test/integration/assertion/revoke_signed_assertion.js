@@ -6,7 +6,9 @@ module.exports = async function (badger, options) {
     
     const assertion = {...await badger.getHeapObject({key: `assertion-${options.assertionEntityId}`})};
 
-    const issuerEntityId = assertion.badge.issuer.id.split("/").pop().replace(".json", "");
+    const badgeClass = {...await badger.getHeapObject({key: `badgeClass-${assertion.badgeClassEntityId}`})};
+
+    const issuerEntityId = badgeClass.issuerEntityId;
 
     const revocationList = {...await badger.getHeapObject({key: `revocationList-${issuerEntityId}`})};
 

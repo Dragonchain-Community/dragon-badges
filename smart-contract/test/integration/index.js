@@ -99,7 +99,7 @@ badger.client = {
 
     assert.deepStrictEqual(result.actual, result.expected);
 
-    let signedAssertion = await badger.getHeapObject({"key": `assertion-${result.requestTxnId}`});
+    let signedAssertion = await badger.getHeapObject({"key": `signedAssertion-${result.requestTxnId}`});
 
     // Assert hosted assertion created //
     result = await test.assertion.create_hosted_assertion(badger, {badgeClassEntityId: badgeClass.entityId, issuerEntityId: issuer.entityId});

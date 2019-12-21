@@ -222,7 +222,9 @@ module.exports = {
 
         const assertionKey = `assertion-${requestTxnId}`;
 
-        let assertionObject = {
+        const signedAssertionKey = `signedAssertion-${requestTxnId}`;
+
+        let signedAssertionObject = {
             "@context": "https://w3id.org/openbadges/v2",
             "id": `urn:uuid:${requestTxnId}`,
             "type": "Assertion",            
@@ -258,7 +260,7 @@ module.exports = {
 
         const assertionSignature = jws.sign({
             header: {alg: 'RS256'},
-            payload: assertionObject,
+            payload: signedAssertionObject,
             privateKey: this.config.privateKey
         });
 
@@ -270,8 +272,6 @@ module.exports = {
         if (badgeClassImageObject.extension == "svg")
             bakedImageBuffer = Buffer.from(bakedImageBuffer).toString("base64");
 
-        //console.log(bakedImageBuffer.toString("base64"));
-
         const bakedImageKey = `image-${requestTxnId}`;
 
         const bakedImageObject = {
@@ -282,10 +282,11 @@ module.exports = {
 
         let output = {
             "response": {
-                "type": "createAssertion",
+                "type": "createSignedAssertion",
                 "entity": entity
             },
-            [assertionKey]: assertionObject,
+            [assertionKey]: entity,
+            [signedAssertionKey]: signedAssertionObject,
             [assertionSignatureKey]: assertionSignature,
             [bakedImageKey]: bakedImageObject
         }
@@ -299,7 +300,9 @@ module.exports = {
 
         const assertion = await this.getHeapObject({key: `assertion-${inRevocation.assertionEntityId}`});
 
-        const issuerEntityId = assertion.badge.issuer.id.split("/").pop().replace(".json", "");
+        const badgeClass = await this.getHeapObject({key: `badgeClass-${assertion.badgeClassEntityId}`});
+
+        const issuerEntityId = badgeClass.issuerEntityId;
 
         const revocationList = await this.getHeapObject({key: `revocationList-${issuerEntityId}`});
 
@@ -351,7 +354,9 @@ module.exports = {
 
         const assertionKey = `assertion-${requestTxnId}`;
 
-        let assertionObject = {
+        const hostedAssertionKey = `hostedAssertion-${requestTxnId}`;
+
+        let hostedAssertionObject = {
             "@context": "https://w3id.org/openbadges/v2",
             "id": `${urlPrefix}/hostedAssertion/${requestTxnId}.json`,
             "type": "Assertion",            
@@ -384,10 +389,11 @@ module.exports = {
 
         let output = {
             "response": {
-                "type": "createAssertion",
+                "type": "createHostedAssertion",
                 "entity": entity
             },
-            [assertionKey]: assertionObject,
+            [assertionKey]: entity,
+            [hostedAssertionKey]: hostedAssertionObject,
             [bakedImageKey]: bakedImageObject
         }
 
