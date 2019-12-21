@@ -1,4 +1,4 @@
-# CEBlocks Web Server
+# Dragon Badges Web Server
 
 ## Configuration
 
@@ -18,6 +18,6 @@ or in development mode:
 
 ```npm start```
 
-The server is configured to run at `http://127.0.0.1:3015` by default.
+The server is configured to run at `http://127.0.0.1:3025` by default.
 
 *Note: the server actually binds to ALL available interfaces/IPs that it can by default.*

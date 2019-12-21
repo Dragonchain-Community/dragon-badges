@@ -1,14 +1,15 @@
-# CEBlocks API Server
+# Dragon Badges API Server
 
 ## Initialization
 
-After installing the smart contract to an L1, replace the contract ID in the `config.js` file.
+After installing the smart contract to an L1, run `node generate-config.js` and replace the contract ID in the `config.json` file.
 
 Then, with your dragonchain credentials file configured per the [Dragonchain SDK docs](https://node-sdk-docs.dragonchain.com/latest/index.html#configuration), initialize your contract with the following command:
 
 ```node initialize-contract.js```
 
 Then note and save the **Master API Key** displayed. ***It will only be displayed once!***
+
 
 ## API Server Startup
 
@@ -20,6 +21,6 @@ To run in development mode (saving file changes will automatically restart the s
 
 ```npm start```
 
-The server is configured to run at `http://127.0.0.1:3030` by default.
+The server is configured to run at `http://127.0.0.1:3050` by default.
 
 *Note: the server actually binds to ALL available interfaces/IPs that it can by default.*
