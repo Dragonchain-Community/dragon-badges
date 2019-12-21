@@ -237,7 +237,7 @@ const main = async() => {
 			"url": issuerObject.url,
 			"image": `${helper.config.urlPrefix}/image/${issuerObject.entityId}.json`,
 			"publicKey": `${helper.config.urlPrefix}/publicKey/${issuerObject.entityId}.json`,
-			"revocationList": `${helper.config.urlPrefix}/publicKey/${issuerObject.entityId}.json`
+			"revocationList": `${helper.config.urlPrefix}/revocationList/${issuerObject.entityId}.json`
 			
 		}
 
