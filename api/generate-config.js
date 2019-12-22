@@ -7,7 +7,8 @@ const config = {
     contractTxnType: "dragonbadges",
     contractId: "",
     urlPrefix: "http://127.0.0.1:3050",
-    port: 3050
+    port: 3050,
+    publicKey: ""
 }
 
 fs.writeFile('config.json', JSON.stringify(config), (err) => {    

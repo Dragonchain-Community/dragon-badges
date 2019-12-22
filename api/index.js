@@ -231,11 +231,8 @@ const main = async() => {
 
 		response.assertion = JSON.parse(response.jwsObject.payload);
 
-		// Download the public key
-		const publicKeyObject = await helper.requestJsonFromURL(response.assertion.badge.issuer.publicKey);
-
 		try{
-			if (jws.verify(bakedData, "RS256", publicKeyObject.publicKeyPem))
+			if (jws.verify(bakedData, "RS256", helper.config.publicKey))
 				response.validSignature = true;
 			else
 				response.validSignature = false;
