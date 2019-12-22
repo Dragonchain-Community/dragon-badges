@@ -1,0 +1,12 @@
+{
+    "revocationList-3b8fea39-c530-448a-a711-402a399cb96f": {
+        "issuerEntityId": "3b8fea39-c530-448a-a711-402a399cb96f",
+        "type": "RevocationList",
+        "revokedAssertions": [
+          {
+            "id": "urn:uuid:70cb2bec-81da-4890-a947-398db10d1d6a",
+            "revocationReason": "Bad stuff."
+          }
+        ]
+    }
+}

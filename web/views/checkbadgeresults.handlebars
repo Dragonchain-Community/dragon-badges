@@ -1,0 +1,25 @@
+<div class="mt-5 mx-auto">
+    <h1 class="mb-5">Badge Check Results</h1>
+
+    <div class="row">
+        <div class="col-9">
+            <p>
+                <b>Valid Signature:</b> {{response.validSignature}}
+            </p>
+            <p>
+                <b>Status:</b> {{response.status}}
+            </p>
+            <p>
+                <b>Email:</b> {{response.email}}
+            </p>
+            <p><b>Assertion:</b></p>
+            <pre class="bg-light p-2"><code>{{jsonPretty response.assertion}}</code></pre>
+        </div>
+        <div class="col-3">
+            <p class="mb-3">
+                <img class="img-fluid" src="{{response.assertion.image}}">
+            </p>
+        </div>
+    </div>
+    
+</div>

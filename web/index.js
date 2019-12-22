@@ -265,6 +265,54 @@ const main = async() => {
 		res.render('signedassertion', {title: "Dragon Badges Signed Assertion", assertion: signedAssertion});
 	}));
 
+
+	app.get('/CheckBadge/', awaitHandlerFactory(async (req, res) => {
+
+		res.render('checkbadge', {title: "Check a Badge"});
+	}));
+
+	app.post('/CheckBadge/', awaitHandlerFactory(async (req, res) => {
+
+		if (!req.files || Object.keys(req.files).length === 0) 
+			return res.status(400).send('No image file was uploaded.');
+		
+		if (req.files.image.mimetype != "image/png" && req.files.image.mimetype != "image/svg+xml")
+			return res.status(400).send("Invalid image type (png and svg only).");
+
+		if (req.files.image.size / 1024 > 258)
+			return res.status(400).send("Image is too large (max allowable size 256KB).");
+
+		let extension = null;
+		if (req.files.image.mimetype == "image/png")
+			extension = "png";		
+		else if (req.files.image.mimetype == "image/svg+xml")
+			extension = "svg";
+
+		const imageObject = {
+			"extension": extension,
+			"contentType": req.files.image.mimetype,
+			"data": req.files.image.data.toString("base64")              
+		}
+
+		const options = {
+			method: 'POST',
+			uri: `${config.apiURL}/checkBadgeImage/`,
+			headers: {
+				"Authorization": `Basic ${config.auth}`
+			},
+			body: {				
+				"imageObject": imageObject,
+				"recipientEmail": req.body.recipientEmail
+			},
+			json: true 
+		};
+		
+		const result = await rp(options);
+
+		res.render('checkbadgeresults', {title: "Badge Check Results", response: result});
+	}));
+
+
     app.use(function (err, req, res, next) {
         console.log(err);
 

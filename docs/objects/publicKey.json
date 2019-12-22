@@ -1,0 +1,7 @@
+{
+    "publicKey-3b8fea39-c530-448a-a711-402a399cb96f": {
+        "type": "CryptographicKey",
+        "issuerEntityId": "3b8fea39-c530-448a-a711-402a399cb96f",
+        "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDewU5HzlDlRJEOYBt/Im1hIzJs\nqp62xx6E+2rm+9inQN8mpqjE52bNtcXwCn4t8/sJoEJd1kz1NIwJeBfUWUu7Iz8m\nqqIcR0wDZtww1UyBHyLXTfVZ88S60JHlM02niZPXfcbITfDkofwJ3vkesqELn/Km\nIdMMuk4NsLyhfpnpIwIDAQAB\n-----END PUBLIC KEY-----\n"
+    }
+}

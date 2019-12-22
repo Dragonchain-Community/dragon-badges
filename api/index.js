@@ -4,6 +4,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
+const jws = require('jws');
+
 
 const helper = require('./dragon-badges-helper');
 
@@ -215,6 +217,63 @@ const main = async() => {
 		res.json(requestTxn);
 	}));
 
+
+	// Check a badge image //
+	app.post('/checkBadgeImage/', authenticate, awaitHandlerFactory(async (req, res) => {
+		
+		const bakedData = await helper.extractBakedImage(req.body.imageObject.data);
+
+		const response = {
+			"bakedData": bakedData
+		};
+
+		response.jwsObject = jws.decode(bakedData);
+
+		response.assertion = JSON.parse(response.jwsObject.payload);
+
+		// Download the public key
+		const publicKeyObject = await helper.requestJsonFromURL(response.assertion.badge.issuer.publicKey);
+
+		try{
+			if (jws.verify(bakedData, "RS256", publicKeyObject.publicKeyPem))
+				response.validSignature = true;
+			else
+				response.validSignature = false;
+		} catch (e)
+		{
+			response.validSignature = false;
+		}
+
+		// Download the revocation list
+		const revocationList = await helper.requestJsonFromURL(response.assertion.badge.issuer.revocationList);
+
+		response.status = "Valid";
+		for (var i = 0; i < revocationList.revokedAssertions.length; i++)
+		{
+			if (typeof revocationList.revokedAssertions[i] === "string")
+			{
+				if (response.assertion.id == revocationList.revokedAssertions[i])				
+					response.status = "Revoked - Reason: Unspecified";
+			} else {
+				if (response.assertion.id == revocationList.revokedAssertions[i].id)
+					response.status = `Revoked - Reason: ${revocationList.revokedAssertions[i].revocationReason}`;
+			}
+
+			if (response.status != "Valid")
+				break;
+		}
+
+		response.email = "Not Checked";
+		if (req.body.recipientEmail)
+		{
+			if (helper.verifyRecipientObjectByEmail(response.assertion.recipient, req.body.recipientEmail))
+				response.email = "Match";
+			else
+				response.email = "No Match";
+		}
+
+		res.json(response);
+	}));
 
 	// +++++++++++ Open Badges-specific public endpoints +++++++++++++ //
 

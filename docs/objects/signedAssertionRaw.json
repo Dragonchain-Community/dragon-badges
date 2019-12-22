@@ -1,0 +1,14 @@
+{
+    "assertion-70cb2bec-81da-4890-a947-398db10d1d6a": {
+        "entityId": "70cb2bec-81da-4890-a947-398db10d1d6a",
+        "type": "Assertion",
+        "recipient": {
+          "type": "email",
+          "hashed": true,
+          "salt": "deadsea",
+          "identity": "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
+        },
+        "issuedOn": "2019-12-21T03:57:23.458Z",
+        "badgeClassEntityId": "14aefcd3-acb8-49f1-b76a-cb1818d9e2e3"
+    }
+}

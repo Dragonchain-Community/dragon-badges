@@ -1,0 +1,13 @@
+{
+    "badgeClass-14aefcd3-acb8-49f1-b76a-cb1818d9e2e3": {
+        "entityId": "14aefcd3-acb8-49f1-b76a-cb1818d9e2e3",
+        "type": "BadgeClass",
+        "issuerEntityId": "3b8fea39-c530-448a-a711-402a399cb96f",
+        "name": "Test Badge",
+        "description": "A badge of badgery.",
+        "criteria": {
+          "narrative": "The means by which a badgery badge is obtained is as follows..."
+        },
+        "imageFileName": "14aefcd3-acb8-49f1-b76a-cb1818d9e2e3.svg"
+    }
+}

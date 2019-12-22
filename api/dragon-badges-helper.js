@@ -1,5 +1,8 @@
 const util = require('util');
 const crypto = require('crypto');
+const rp = require('request-promise');
+
+const oven = require('./bakery-mod');
 
 // Escape a value for redisearch query purposes //
 const redisearchEncode = (value) => {
@@ -297,6 +300,31 @@ const helper = {
     // +++ Utility +++ //
     sleep: (ms) => {
         return new Promise(resolve => setTimeout(resolve, ms));
+    },
+
+    extractBakedImage: async (imageData) => {
+        const bakedData = await oven.extractAsync(Buffer.from(imageData, "base64"));
+
+        return bakedData;
+    },
+
+    requestJsonFromURL: async function (url) {
+        const result = await rp({
+			uri: url,
+			json: true
+        });
+        
+        return result;
+    },
+
+    verifyRecipientObjectByEmail: function (recipientObject, email) {
+        let sum = crypto.createHash('sha256');
+        
+        const salt = recipientObject.salt; 
+        
+        sum.update(email + salt);
+
+        return recipientObject.identity == `sha256$${sum.digest('hex')}`;
     },
 
     getRecipientObjectFromEmail: function (email) {

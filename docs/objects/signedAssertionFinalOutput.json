@@ -1,0 +1,39 @@
+{
+    "signedAssertion-70cb2bec-81da-4890-a947-398db10d1d6a": {
+        "@context": "https://w3id.org/openbadges/v2",
+        "id": "urn:uuid:70cb2bec-81da-4890-a947-398db10d1d6a",
+        "type": "Assertion",
+        "recipient": {
+          "type": "email",
+          "hashed": true,
+          "salt": "deadsea",
+          "identity": "sha256$c7ef86405ba71b85acd8e2e95166c4b111448089f2e1599f42fe1bba46e865c5"
+        },
+        "issuedOn": "2019-12-21T03:57:23.458Z",
+        "badge": {
+          "id": "http://127.0.0.1/badgeClass/14aefcd3-acb8-49f1-b76a-cb1818d9e2e3.json",
+          "type": "BadgeClass",
+          "name": "Test Badge",
+          "description": "A badge of badgery.",
+          "criteria": {
+            "narrative": "The means by which a badgery badge is obtained is as follows..."
+          },
+          "image": "http://127.0.0.1/image/14aefcd3-acb8-49f1-b76a-cb1818d9e2e3.svg",
+          "issuer": {
+            "id": "http://127.0.0.1/issuer/3b8fea39-c530-448a-a711-402a399cb96f.json",
+            "type": "Issuer",
+            "name": "Test Issuer",
+            "description": "A badge issuer",
+            "url": "https://www.example.com",
+            "image": "http://127.0.0.1/image/3b8fea39-c530-448a-a711-402a399cb96f.png",
+            "publicKey": "http://127.0.0.1/publicKey/3b8fea39-c530-448a-a711-402a399cb96f.json",
+            "revocationList": "http://127.0.0.1/revocationList/3b8fea39-c530-448a-a711-402a399cb96f.json"
+          }
+        },
+        "image": "http://127.0.0.1/image/70cb2bec-81da-4890-a947-398db10d1d6a.svg",
+        "verification": {
+          "type": "SignedBadge",
+          "creator": "http://127.0.0.1/publicKey/3b8fea39-c530-448a-a711-402a399cb96f.json"
+        }
+    }
+}

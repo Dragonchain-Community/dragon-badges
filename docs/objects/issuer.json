@@ -1,0 +1,10 @@
+{
+    "issuer-3b8fea39-c530-448a-a711-402a399cb96f": {
+        "entityId": "3b8fea39-c530-448a-a711-402a399cb96f",
+        "type": "Issuer",
+        "name": "Test Issuer",
+        "description": "A badge issuer",
+        "url": "https://www.example.com",
+        "imageFileName": "3b8fea39-c530-448a-a711-402a399cb96f.png"
+    }
+}
