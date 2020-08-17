@@ -14,6 +14,8 @@ To see the data embedded in the image, you can go to [https://badgecheck.io](htt
 
 The Open Badges 2.0 Validator will then display the validation information for the badge (which includes calling back to the REST API specified in the badge data to verify current validity), and you can see the full verification data by clicking the **Show full verification data** link at the bottom of the page.
 
+Note that there's an option to verify the email address signed into the badge "assertion" (the statement from the badge issuer as to who received the badge). Since you don't know the email address I used (I don't remember either, frankly...), you can't prove ownership. Even if you did, though, badge issuers could take steps to send a confirmation email, etc., to truly prove ownership of the badge in the simplest case.
+
 ## State of the Project
 
 The API and smart contract presented here are functional, though more advanced/correct API authentication should be explored.
